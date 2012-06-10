@@ -56,7 +56,7 @@ def set_A(value):
 
 def set_AB(value):
     assert len(value) == 35
-    return accumlator[:35]
+    accumlator[:35] = value #no?, function named set_AB
 
 def get_ABC():
     return accumlator

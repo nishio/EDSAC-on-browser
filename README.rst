@@ -1,12 +1,16 @@
-===========================
- EDSAC Simulator in Python
-===========================
+============================
+ EDSAC Simulator on browser
+============================
 
 I think EDSAC is good to learn machine language,
 because recent CPU is complex.
 
 My goal is to make a Python version to run on console,
 and a JavaScript version to run on browser.
+
+**NOTICE**
+
+This code is not complete yet.
 
 
 Design
@@ -26,6 +30,14 @@ MIT License
 Reference
 =========
 
-http://www.cl.cam.ac.uk/~mr/edsacposter.pdf
+- http://www.cl.cam.ac.uk/~mr/edsacposter.pdf
+  code of initial order and square are come from this poster.
+  "11100 0 0000100010 0 62 S34S" seems typo of "01100 ..."
+- http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
+- http://www.cs.clemson.edu/~mark/edsac.html
 
-http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
+  
+Thanks
+======
+
+Artem Smirnov, Mustafa Karimi, Yoni Tresina Purbasari

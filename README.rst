@@ -26,6 +26,8 @@ License
 
 MIT License
 
+by NISHIO Hirokazu (c)2012
+
 
 Reference
 =========
@@ -36,8 +38,8 @@ Reference
 - http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
 - http://www.cs.clemson.edu/~mark/edsac.html
 
-  
+
 Thanks
 ======
 
-Artem Smirnov, Mustafa Karimi, Yoni Tresina Purbasari
+Artem Smirnov, Mustafa Karimi, Yoni Tresina Purbasari, Dariane Joy Papa

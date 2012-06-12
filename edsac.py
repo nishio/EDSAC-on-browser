@@ -1,281 +1,299 @@
 # -*- encoding: utf-8 -*-
-
-import re
-env = {}
-env['pc'] = 0
-
-# Memory
-# 512 words of 35 bits
-memory = [[0] * 35 for n in range(512)]
-
-def get_memory(a):
-    assert 0 <= a < 1024
-    high_low = a % 2
-    w = get_memory_word(a - high_low)
-    if high_low:
-        # m[1] is the senior half of w[0]
-        result = w[:17]
-    else:
-        result = w[-17:]
-    return result
-
-
-def set_memory(a, value):
-    assert 0 <= a < 1024
-    assert len(value) == 17
-    high_low = a % 2
-    w = get_memory_word(a - high_low)
-    if high_low:
-        # m[1] is the senior half of w[0]
-        w[:17] = value
-    else:
-        w[-17:] = value
-
-
-def get_memory_word(a):
-    assert a % 2 == 0
-    assert 0 <= a < 1024
-    return memory[a / 2]
-
-
-# The machine had two central registers visible to the user:
-# the 71-bit accumulator and the 35-bit multiplier register.
-accumlator = [0] * 71
-multiplier = [0] * 35
-pc = 0
-
-def get_A():
-    return accumlator[:17]
-
-def get_AB():
-    return accumlator[:35]
-
-def set_A(value):
-    assert len(value) == 17
-    accumlator[:17] = value
-
-def set_AB(value):
-    assert len(value) == 35
-    accumlator[:35] = value #no?, function named set_AB
-
-def get_ABC():
-    return accumlator
-
-def clear_ABC():
-    global accumlator
-    accumlator = [0] * 71
-
-def get_R():
-    return multiplier[:17]
-
-def set_R(value):
-    assert len(value) == 17
-    multiplier[:17] = value
-
-def get_RS():
-    return multiplier
-
-
-LETTERS = 'P Q W E R T Y U I O J figs S Z K lets null F cr D sp H N M lf L X G A B C V'.split()
-FIGURES = '0 1 2 3 4 5 6 7 8 9 ? figs \" + ( lets null $ cr ; sp £ , . lf ) / # - ? : ='.split()
-assert len(LETTERS) == 32
-assert len(FIGURES) == 32
-
-def bits2number(bits):
-    """
-    >>> bits2number(number2bits(1234))
-    1234
-    """
-    result = 0
-    for v in bits:
-        result *= 2
-        result += v
-    return result
-
-def number2bits(number, width=17):
-    """
-    >>> number2bits(15)
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1]
-    """
-    result = []
-    for i in range(width):
-        result.insert(0, number & 1)
-        number /= 2
-    return result
-
-def bits2order(bits):
-    """
-    >>> bits2order(order2bits(('R', 16, 'S')))
-    ('R', 16, 'S')
-    >>> bits2order(order2bits(('T', 11, 'L')))
-    ('T', 11, 'L')
-    """
-    assert len(bits) == 17
-    op = LETTERS[bits2number(bits[:5])]
-    addr = bits2number(bits[6:16])
-    sl = 'SL'[bits[16]]
-    return (op, addr, sl)
-
-def pretty_order_bits(bits):
-    """
-    >>> pretty_order_bits([0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
-    '00100 0 0000010000 0'
-    """
-    return '%d%d%d%d%d %d %d%d%d%d%d%d%d%d%d%d %d' % tuple(bits)
-
-def order2bits((op, addr, sl)):
-    """
-    >>> pretty_order_bits(order2bits(('R', 16, 'S')))
-    '00100 0 0000010000 0'
-    >>> pretty_order_bits(order2bits(('T', 11, 'L')))
-    '00101 0 0000001011 1'
-    """
-    assert isinstance(op, str) and len(op) == 1
-    assert isinstance(addr, int)
-    assert sl in ['S', 'L']
-    if sl == 'S':
-        sl = 0
-    else:
-        sl = 1
-    result = (
-        number2bits(LETTERS.index(op), 5) +
-        [0] +
-        number2bits(addr, 10) +
-        [sl])
-    return result
-
-ORDER_PATTERN = '([A-Z])(\d+)([SL])'
-
-def parse(s):
-    """
-    >>> pretty_order_bits(parse('PS'))
-    '00000 0 0000000000 0'
-    >>> pretty_order_bits(parse('P10000S'))
-    FIXME
-    >>> pretty_order_bits(parse('QS'))
-    FIXME
-    >>> pretty_order_bits(parse('#S'))
-    FIXME
-    """
-    result = [0] * 17
-    if s == 'PS':
-        return result
-
-def parse_order(s):
-    s = s.upper()
-    m = re.match(ORDER_PATTERN, s)
-    if not m:
-        raise AssertionError("Can't parse: %s" % s)
-    op, addr, sl = m.groups()
-    addr = int(addr)
-    return (op, addr, sl)
-
-def add(x, y):
-    N = len(x)
-    assert len(y) == N
-    result = bits2number(x) + bits2number(y)
-    result = number2bits(result, N)
-    return result
-
-
-def negative_A():
-    if accumlator[0] == 1:
-        return True
-    return False
-
-
-def exec_step(order):
-    op, addr, sl = order
-    assert isinstance(addr, int)
-    assert sl in 'SL'
-
-    if op == 'A':
-        if sl == 'S':
-            set_A(add(get_A(), get_memory(addr)))
-            return
-        else:
-            set_AB(add(get_AB(), get_memory_word(addr)))
-            return
-
-    if op == 'T':
-        if sl == 'S':
-            # m[n]=A;ABC=0
-            set_memory(addr, get_A())
-            clear_ABC()
-            return
-        else:
-            set_memory_wide(addr, get_AB())
-            clear_ABC()
-            return
-
-    if op == 'H':
-        if sl == 'S':
-            # R += m[n]
-            set_R(add(get_R(), get_memory(addr)))
-            return
-        else:
-            set_RS(get_RS(), get_memory_word(addr))
-            return
-
-    if op == 'V':
-        if sl == 'S':
-            # AB+=m[n]*R
-            set_AB(number2bits(bits2number(get_memory(addr)) * get_R()), 35)
-            return
-        else:
-            set_ABC(number2bits(bits2number(get_memory_word(addr)) * get_RS()), 71)
-            return
-
-    if op == 'I':
-        ch = buf.pop(0)
-        assert len(ch) == 5
-        get_memory(addr)[-5:] = ch
-        return
-
-    if op == 'E':
-        if not negative_A():
-            env['pc'] = addr - 1
-        return
-
-    if op == 'G':
-        if negative_A():
-            env['pc'] = addr - 1
-        return
-
-    raise NotImplementedError, order
-
-INITIAL_ORDER = """
-T0S H2S T0S E6S P1S P5S T0S I0S A0S R16S
-T0L I2S A2S S5S E21S T3S V1S L8S A2S T1S
-E11S R4S A1S L0L A0S T31S A25S A4S U25S S31S
-G6S
 """
-
-IN_TAPE_BUFFER = """
-T123S E84S PS PS P10000S P1000S P100S P10S P1S QS
-#S A40S !S &S @S O43S O33S PS A46S T65S
-T129S A35S T34S E61S T48S A47S T65S A33S A40S T33S
-A48S S34S E55S A34S PS T48S T33S A52S A4S U52S
-S42S G51S A117S T52S PS
+EDSAC emulator
 """
+from parser import Value, _ascii_to_edsac, _number2bits
+BIT_MASK_17 = 0b11111111111111
 
-assert len(re.findall(ORDER_PATTERN, INITIAL_ORDER)) == 31
-MEM = re.findall(ORDER_PATTERN, INITIAL_ORDER)
-for i in range(len(MEM)):
-    set_memory(i, order2bits((MEM[i][0], int(MEM[i][1]), MEM[i][2])))
+class WideValue(object):
+    "35bit words"
+    def __init__(self, high=None, low=None, padding_bit=0):
+        if not high: high = Value()
+        if not low: low = Value()
+        self.high = high
+        self.low = low
+        self.padding_bit = padding_bit
 
-def main():
-    env['pc'] = 0
-    while True:
-        order = bits2order(get_memory(env['pc']))
-        exec_step(order)
-        env['pc'] += 1
+    def as_number(self):
+        return (
+            self.high.as_number() << 18 +
+            self.padding_bit << 17 +
+            self.low.as_number())
 
-buf = []
+    @staticmethod
+    def from_number(v):
+        assert isinstance(v, int) or isinstance(v, long), v
+        low = v & BIT_MASK_17
+        padding_bit = (v >> 17) & 1
+        high = v >> 18
+        return WideValue(
+            Value.from_number(high),
+            Value.from_number(low),
+            padding_bit)
+
+    def __add__(self, v):
+        assert isinstance(v, WideValue)
+        return WideValue.from_number(
+            self.as_number() + v.as_number())
+
+memory = [WideValue() for i in range(512)]
+
+def set_memory(address, value, wide=False):
+    assert 0 <= address < 1024
+    if wide:
+        assert isinstance(value, WideValue)
+        memory[address / 2] = value
+    else:
+        assert isinstance(value, Value)
+        is_high = address % 2 # m[1] is senior half of w[0]
+        w = memory[address / 2]
+        if is_high:
+            w.high = value
+        else:
+            w.low = value
+
+def get_memory(address, wide=False):
+    assert 0 <= address < 1024
+    is_high = address % 2 # m[1] is senior half of w[0]
+    w = memory[address / 2]
+    if wide:
+        assert is_high == 0
+        return w
+    else:
+        if is_high:
+            return w.high
+        else:
+            return w.low
+
+# ABC register: accumulator
+class ThreeValue(object):
+    def __init__(self, high=None, low=None, padding_bit=0):
+        if not high: high = Value()
+        if not low: low = Value()
+        self.high = WideValue()
+        self.padding_bit = padding_bit
+        self.low = Value()
+
+    def from_number(self, v):
+        assert isinstance(v, int) or isinstance(v, long), v
+        low = v & BIT_MASK_17
+        padding_bit = (v >> 17) & 1
+        high = v >> 18
+        self.high = WideValue.from_number(high)
+        self.low = Value.from_number(low)
+        self.padding_bit = padding_bit
+
+    def as_number(self):
+        return (
+            self.high.as_number() << 18 +
+            self.padding_bit << 17 +
+            self.low.as_number())
+
+def clear_accumulator():
+    accumulator.__init__()
+
+def get_accumulator(wide=False):
+    """
+    from ABC accumulator register,
+    return senior 17 bit (A) or
+    return senior 35 bit (AB)
+    """
+    global accumulator
+    if wide: # AB
+        return accumulator.high
+    return accumulator.high.high # A
+
+def set_accumulator(value, wide=False):
+    if wide:
+        assert isinstance(value, WideValue)
+        accumulator.high = value
+    else:
+        assert isinstance(value, Value)
+        accumulator.high.high = value
+
+accumulator = ThreeValue()
+
+# RC register: multiplier
+multiplier = WideValue()
+def get_multiplier(wide=False):
+    if wide:
+        return multiplier
+    return multiplier.high
+
+def set_multiplier(value, wide=False):
+    global multiplier
+    if wide:
+        assert isinstance(value, WideValue)
+        multiplier = value
+    multiplier.high = value
+
 
 def _test():
     import doctest
     doctest.testmod()
+
+def load_initial_order():
+    i = 0
+    for line in open("initial_order.txt"):
+        bits_str = line[:20]
+        v = Value.from_bits_string(bits_str)
+        set_memory(i, v)
+        i += 1
+
+def set_cards():
+    global cards, next_char
+    cards = []
+    for line in open("square_card.txt"):
+        if line == "\n":
+            continue # skip empty line
+        cards.append(line[0])
+
+    assert cards[0] == "T"
+    next_char = 0
+
+def start():
+    global sequence_control
+    # The 10-bit sequence control register (scr) holds address of next instruction
+    sequence_control = 0
+    is_finished = False
+    while not is_finished:
+        is_finished = step()
+
+def step():
+    global sequence_control, next_char
+    assert 0 <= sequence_control < 1024
+    instr = get_memory(sequence_control)
+    print instr.as_order()
+    op, addr, sl = instr.as_order()
+    wide = (sl == "L")
+
+    if op == "T":
+        # TnS: m[n]=A; ABC=0
+        # TnL: w[n]=AB; ABC=0
+        set_memory(addr, get_accumulator(wide), wide)
+        clear_accumulator()
+    elif op == "H":
+        # HnS: R += m[n]
+        # HnL: RS += w[n]
+        m = get_memory(addr, wide)
+        r = get_multiplier(wide)
+        r = m + r
+        set_multiplier(r, wide)
+
+    elif op == "E":
+        # if A >= 0 goto n
+        if get_accumulator().bits[0] == 0: # A >= 0
+            sequence_control = addr - 1
+    elif op == "G":
+        # if A < 0 goto n
+        if get_accumulator().bits[0] == 1: # A < 0
+            sequence_control = addr - 1
+
+    elif op == "I":
+        # Place the next paper tape character in the least significant 5 bits of m[n].
+        c = cards[next_char]
+        next_char += 1
+        v = _ascii_to_edsac(c)
+        print "read", c
+        bits = _number2bits(v, width=5)
+        get_memory(addr).bits[:5] = bits
+
+    elif op == "A":
+        # AnS: A += m[n]
+        # AnL: AB += w[n]
+        m = get_memory(addr, wide)
+        r = get_accumulator(wide)
+        r = m + r
+        set_accumulator(r, wide)
+    elif op == "S":
+        m = get_memory(addr, wide)
+        r = get_accumulator(wide)
+        r = m - r
+        set_accumulator(r, wide)
+    elif op == "V":
+        m = get_memory(addr, wide)
+        r = get_multiplier(wide)
+        v = m.as_number() * r.as_number()
+        if wide:
+            a = accumulator
+        else:
+            a = get_accumulator(wide=True)
+        v += a.as_number()
+        a.from_number(v)
+    elif op == "N":
+        m = get_memory(addr, wide)
+        r = get_multiplier(wide)
+        v = m.as_number() * r.as_number()
+        if wide:
+            a = accumulator
+        else:
+            a = get_accumulator(wide=True)
+        v -= a.as_number()
+        a.from_number(v)
+
+    elif op == "R":
+        # Shift right
+        num_shift = _calc_num_shift(instr)
+        v = accumulator.as_number()
+        v = v >> num_shift
+        accumulator.from_number(v)
+    elif op == "L":
+        # Shift left
+        num_shift = _calc_num_shift(instr)
+        v = accumulator.as_number()
+        v = v << num_shift
+        accumulator.from_number(v)
+
+    elif op == "U":
+        # UnS: m[n]=A
+        # UnL: w[n]=AB
+        set_memory(addr, get_accumulator(wide))
+
+    elif op == "O":
+        # output
+        print "output", get_memory(addr).as_character()
+
+    elif op == "X":
+        pass # no operation
+    elif op == "F":
+        raise NotImplementedError("Verify the last character output. What?")
+    else:
+        raise NotImplementedError(instr.as_order())
+
+    sequence_control += 1
+
+def _calc_num_shift(instr):
+    """
+    >>> def test(s): return _calc_num_shift(Value.from_order_string(s))
+    >>> test("R0L")
+    1
+    >>> test("R1S")
+    2
+    >>> test("R16S")
+    6
+    >>> test("R0S")
+    15
+    >>> test("L0L")
+    1
+    >>> test("L1S")
+    2
+    >>> test("L16S")
+    6
+    >>> test("L64S")
+    8
+    >>> test("L0S")
+    13
+    """
+    num_shift = 1
+    bits = instr.bits
+    while bits[17 - num_shift] == 0:
+        num_shift += 1
+    return num_shift
+
+def main():
+    load_initial_order()
+    set_cards()
+    start()
 
 if __name__ == '__main__':
     _test()

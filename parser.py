@@ -32,7 +32,7 @@ def _ascii_to_edsac(c):
     """
     take a ascii character and return edsac code
     """
-    assert isinstance(c, str) and len(c) == 1
+    assert isinstance(c, str) and len(c) == 1, c
     r = LETTERS.find(c)
     if r == -1: # not found
         r = FIGURES.find(c)
@@ -43,7 +43,7 @@ def _ascii_to_edsac(c):
 
 class Value(object):
     """
-    Value object hold bit pattern.
+    Value object hold 17 bits.
     It can construct from number, order_string, order
 
     >>> Value().as_number()
@@ -51,6 +51,7 @@ class Value(object):
     """
     def __init__(self, bits=None):
         if bits:
+            assert len(bits) == 17
             self.bits = bits
         else:
             self.bits = [0] * 17
@@ -174,24 +175,21 @@ class Value(object):
         addr = int(addr)
         return Value.from_order((op, addr, sl))
 
+    def as_character(self):
+        # FIXME: switching letters/figures needed
+        return FIGURES[_bits2number(self.bits[:5])]
 
+    def __add__(self, v):
+        assert isinstance(v, Value)
+        return Value.from_number(
+            self.as_number() + v.as_number())
+
+    def __sub__(self, v):
+        assert isinstance(v, Value)
+        return Value.from_number(
+            self.as_number() - v.as_number())
 
 ORDER_PATTERN = '([A-Z#!&@])(\d*)([SL])'
-
-INITIAL_ORDER = """
-T0S H2S T0S E6S P1S P5S T0S I0S A0S R16S
-T0L I2S A2S S5S E21S T3S V1S L8S A2S T1S
-E11S R4S A1S L0L A0S T31S A25S A4S U25S S31S
-G6S
-"""
-
-IN_TAPE_BUFFER = """
-T123S E84S PS PS P10000S P1000S P100S P10S P1S QS
-#S A40S !S &S @S O43S O33S PS A46S T65S
-T129S A35S T34S E61S T48S A47S T65S A33S A40S T33S
-A48S S34S E55S A34S PS T48S T33S A52S A4S U52S
-S42S G51S A117S T52S PS
-"""
 
 def _test_parser():
     for line in file("initial_order.txt"):

@@ -6,6 +6,7 @@ import re
 
 def _number2bits(number, width=17):
     result = []
+    if number < 0: number += 2 ** width
     for i in range(width):
         result.insert(0, number & 1)
         number /= 2
@@ -150,6 +151,9 @@ class Value(object):
         00100 0 0000010000 0
         """
         return '%d%d%d%d%d %d %d%d%d%d%d%d%d%d%d%d %d' % tuple(self.bits)
+
+    def as_bits_string(self):
+        return '%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d' % tuple(self.bits)
 
     def __repr__(self):
         return self.as_pretty_bits_string()

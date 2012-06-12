@@ -21,6 +21,12 @@ For easy learning and inspectation,
 use memories in human-readable way.
 
 
+TODO
+====
+
+- most high bit of tape is complemented. write test.
+- complete "_test_initial_order()" (now on line 9)
+
 License
 =======
 

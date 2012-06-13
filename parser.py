@@ -6,7 +6,7 @@ import re
 
 def _number2bits(number, width=17):
     result = []
-    if number < 0: number += 2 ** width
+    number %= (1 << width) # round into 0 .. (1 << width) - 1
     for i in range(width):
         result.insert(0, number & 1)
         number /= 2

@@ -228,7 +228,7 @@ class Edsac(object):
             # finish
             return True
         else:
-            raise NotImplementedError(instr.as_order())
+            raise AssertionError("Malformed Instruction:", instr.as_order())
 
         self.sequence_control += 1
         return False # not finished

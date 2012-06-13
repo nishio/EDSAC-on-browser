@@ -272,6 +272,9 @@ class WideValue(object):
 
 
 class ThreeValue(object):
+    """
+    71-bit register (for accumlator)
+    """
     def __init__(self, high=None, low=None, padding_bit=0):
         if not high: high = Value()
         if not low: low = Value()

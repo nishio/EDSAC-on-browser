@@ -348,7 +348,17 @@ def _test_initial_order():
     edsac.step() # 8: A += m[0]
     assert edsac.get_accumulator().bits[:5] == [0, 0, 1, 0, 1]
     edsac.step() # 9: ABC >>= 6
-    print edsac.accumulator
+    assert edsac.get_accumulator().as_bits_string() == "00000000101000000"
+    edsac.step() # 10: w[0] = AB; ABC=0
+    # m[0] is now 0
+    assert edsac.get_memory(0).as_number() == 0
+    edsac.step() # 11: read 1 into m[2]
+    assert edsac.get_memory(2).bits[:5] == [0, 0, 0, 0, 1]
+    edsac.step() # 12: A+=m[2]
+    assert edsac.get_accumulator().bits[:5] == [0, 0, 0, 0, 1]
+    edsac.step() # 13: A-=m[5]
+    assert edsac.get_memory(5).as_bits_string() == "00000000000001010"
+    print edsac.get_accumulator().as_bits_string()
 
 def _test():
     import doctest
@@ -356,11 +366,10 @@ def _test():
     _test_initial_order()
 
 def main():
-    return
     edsac = Edsac()
     edsac.load_initial_order()
     edsac.set_cards_from_file()
-    #edsac.start()
+    edsac.start()
 
 
 if __name__ == '__main__':

@@ -1,13 +1,23 @@
 # -*- encoding: utf-8 -*-
 """
-parser
+edsac_parser
 """
 import re
 
-def _number2bits(number, width=17):
+HALF_WORD_LENGTH = 17
+ORDER_FORMAT = {
+    'OP_START': None,
+    'OP_END': 5,
+    'ADDRESS_START': 6,
+    'ADDRESS_END': 16,
+    'SL': 16
+}
+
+def _number2bits(number, width=HALF_WORD_LENGTH):
     result = []
-    number %= (1 << width) # round into 0 .. (1 << width) - 1
-    for i in range(width):
+    # round into 0 .. (1 << width) - 1
+    number %= (1 << width)
+    for i in xrange(width):
         result.insert(0, number & 1)
         number /= 2
     return result
@@ -27,6 +37,7 @@ figs: #, lets: *, null: ., cr: @, sp: !, lf: &
 
 LETTERS = 'PQWERTYUIOJ#SZK*.F@D!HNM&LXGABCV'
 FIGURES = '0123456789?#"+(*.$@;!\xa3,.&)/#-?:='
+
 
 assert len(LETTERS) == 32
 assert len(FIGURES) == 32
@@ -54,10 +65,10 @@ class Value(object):
     """
     def __init__(self, bits=None):
         if bits:
-            assert len(bits) == 17
+            assert len(bits) == HALF_WORD_LENGTH
             self.bits = bits
         else:
-            self.bits = [0] * 17
+            self.bits = [0] * HALF_WORD_LENGTH
 
     @staticmethod
     def from_number(v):
@@ -90,39 +101,30 @@ class Value(object):
         >>> x.as_pretty_bits_string()
         '00101 0 0000001011 1'
         """
-        (op, addr, sl) = order
+        op, addr, sl = order
         assert isinstance(op, str) and len(op) == 1
         assert isinstance(addr, int)
         assert sl in ['S', 'L']
-        # #!&@
         if sl == 'S':
-            sl = 0
+            sl = [0]
         else:
-            sl = 1
+            sl = [1]
         if addr < 2 ** 10:
-            result = (
-                # 5 bits op
-                _number2bits(
-                    _ascii_to_edsac(op), 5
-                ) +
-                # 1 bit unused
-                [0] +
-                # 10 bits address
-                _number2bits(addr, 10) +
-                # 1 bit S/L
-                [sl]
-            )
+            # 5 bits op
+            op_bit = _number2bits(_ascii_to_edsac(op), 5)
+            # 1 bit unused
+            unused_bit = [0]
+            # 10 bits address
+            addr_bit = _number2bits(addr, 10)
+            # 1 bit S/L
+            result = op_bit + unused_bit + addr_bit + sl
         else:
             # such as "P10000S"
             if op != "P":
                 raise NotImplementedError(
                     "I don't know how to put %s in bits" % order)
-            result = (
-                # 16 bits
-                _number2bits(addr, 16) +
-                # 1 bit S/L
-                [sl])
-
+            # 16 bits
+            result = _number2bits(addr, 16) + sl
         return Value(result)
 
     def as_order(self):
@@ -134,10 +136,14 @@ class Value(object):
         >>> x.as_order()
         ('T', 11, 'L')
         """
-        assert len(self.bits) == 17
+        assert len(self.bits) == HALF_WORD_LENGTH
         op = LETTERS[_bits2number(self.bits[:5])]
-        addr = _bits2number(self.bits[6:16])
-        sl = 'SL'[self.bits[16]]
+        addr = _bits2number(
+            self.bits[
+                ORDER_FORMAT['ADDRESS_START']: ORDER_FORMAT['ADDRESS_END']
+            ]
+        ) # 6:16
+        sl = 'SL'[self.bits[ORDER_FORMAT['SL']]]
         return (op, addr, sl)
 
     @staticmethod
@@ -147,18 +153,18 @@ class Value(object):
         00100 0 0000010000 0
         """
         bits = re.findall("[01]", s)
-        assert len(bits) == 17
-        return Value(map(int, bits))
+        assert len(bits) == HALF_WORD_LENGTH
+        return Value([int(i) for i in bits])
 
     def as_pretty_bits_string(self):
         """
         >>> Value([0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
         00100 0 0000010000 0
         """
-        return '%d%d%d%d%d %d %d%d%d%d%d%d%d%d%d%d %d' % tuple(self.bits)
+        return '{}{}{}{}{} {} {}{}{}{}{}{}{}{}{}{} {}'.format(*self.bits)
 
     def as_bits_string(self):
-        return '%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d' % tuple(self.bits)
+        return '{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}{}'.format(*self.bits)
 
     def __repr__(self):
         return self.as_pretty_bits_string()
@@ -180,13 +186,16 @@ class Value(object):
         if not m:
             raise AssertionError("Can't parse: %s" % s)
         op, addr, sl = m.groups()
-        if addr == "": addr = "0"
+        if addr == "":
+            addr = "0"
         addr = int(addr)
         return Value.from_order((op, addr, sl))
 
     def as_character(self):
         # FIXME: switching letters/figures needed
-        return FIGURES[_bits2number(self.bits[:5])]
+        return FIGURES[_bits2number(
+            self.bits[ORDER_FORMAT['OP_START']: ORDER_FORMAT['OP_END']]
+        )]
 
     def __add__(self, v):
         assert isinstance(v, Value)
@@ -201,16 +210,19 @@ class Value(object):
 ORDER_PATTERN = '([A-Z#!&@])(\d*)([SL])'
 
 def _test_parser():
+    MAX_BITS_LINE_LENGTH = 20
+    INITIAL_ORDER_LINE_STARTS = 21
+
     for line in file("initial_order.txt"):
-        bits_str = line[:20]
-        order_str = line[21:].split()[1]
+        bits_str = line[:MAX_BITS_LINE_LENGTH]
+        order_str = line[INITIAL_ORDER_LINE_STARTS:].split()[1]
         assert (
             Value.from_order_string(order_str)
             .as_pretty_bits_string() == bits_str)
 
     for line in file("square.txt"):
-        bits_str = line[:20]
-        order_str = line[21:].split()[1]
+        bits_str = line[:MAX_BITS_LINE_LENGTH]
+        order_str = line[INITIAL_ORDER_LINE_STARTS:].split()[1]
         assert (
             Value.from_order_string(order_str)
             .as_pretty_bits_string() == bits_str), line
@@ -222,3 +234,4 @@ def _test():
 if __name__ == '__main__':
     _test()
     _test_parser()
+

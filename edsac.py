@@ -2,8 +2,13 @@
 """
 EDSAC emulator
 """
-from parser import Value, _ascii_to_edsac, _number2bits
+import sys
+from edsac_parser import Value, _ascii_to_edsac, _number2bits
+
+
 BIT_MASK_17 = (1 << 17) - 1
+MIN_MEMORY_ADDR = 0
+MAX_MEMORY_ADDR = 1024
 
 class Edsac(object):
     def __init__(self):
@@ -13,10 +18,8 @@ class Edsac(object):
         self.accumulator = ThreeValue()
         # RC register: 35bits multiplier
         self.multiplier = WideValue()
-
         self.cards = []
         self.next_char = 0
-
         self.sequence_control = 0
 
     def get_multiplier(self, wide=False):
@@ -45,17 +48,17 @@ class Edsac(object):
                 w.low = value
 
     def get_memory(self, address, wide=False):
-        assert 0 <= address < 1024
+        assert MIN_MEMORY_ADDR <= address < MAX_MEMORY_ADDR
         is_high = address % 2 # m[1] is senior half of w[0]
-        w = self.memory[address / 2]
+        word = self.memory[address / 2]
         if wide:
             assert is_high == 0
-            return w
+            return word
         else:
             if is_high:
-                return w.high
+                return word.high
             else:
-                return w.low
+                return word.low
 
     def clear_accumulator(self):
         self.accumulator.__init__()
@@ -78,14 +81,11 @@ class Edsac(object):
             assert isinstance(value, Value)
             self.accumulator.high.high = value
 
-
     def load_initial_order(self):
-        i = 0
-        for line in open("initial_order.txt"):
+        for i, line in enumerate(open("initial_order.txt")):
             bits_str = line[:20]
             v = Value.from_bits_string(bits_str)
             self.set_memory(i, v)
-            i += 1
 
     def set_cards_from_file(self):
         self.cards = []
@@ -112,7 +112,7 @@ class Edsac(object):
             is_finished = self.step()
 
     def step(self):
-        assert 0 <= self.sequence_control < 1024
+        assert MIN_MEMORY_ADDR <= self.sequence_control < MAX_MEMORY_ADDR
         instr = self.get_memory(self.sequence_control)
         # debug
         print self.accumulator
@@ -136,9 +136,6 @@ class Edsac(object):
 
         elif op == "E":
             # if A >= 0 goto n
-            if self.sequence_control == 14:
-                print self.get_accumulator()
-                print self.get_accumulator().as_number()
             if self.get_accumulator().bits[0] == 0: # A >= 0
                 self.sequence_control = addr - 1
         elif op == "G":
@@ -237,8 +234,10 @@ class Edsac(object):
 class WideValue(object):
     "35bit words"
     def __init__(self, high=None, low=None, padding_bit=0):
-        if not high: high = Value()
-        if not low: low = Value()
+        if not high:
+            high = Value()
+        if not low:
+            low = Value()
         self.high = high
         self.low = low
         self.padding_bit = padding_bit
@@ -266,7 +265,7 @@ class WideValue(object):
             self.as_number() + v.as_number())
 
     def __repr__(self):
-        return "%s %d %s" % (
+        return "{} {} {}".format(
             self.high.as_bits_string(),
             self.padding_bit,
             self.low.as_bits_string())
@@ -277,15 +276,16 @@ class ThreeValue(object):
     71-bit register (for accumlator)
     """
     def __init__(self, high=None, low=None, padding_bit=0):
-        if not high: high = Value()
-        if not low: low = Value()
+        if not high:
+            high = Value()
+        if not low:
+            low = Value()
         self.high = WideValue()
         self.padding_bit = padding_bit
         self.low = Value()
 
     def from_number(self, v):
         assert isinstance(v, int) or isinstance(v, long), v
-        print "v", v
         low = v & BIT_MASK_17
         padding_bit = (v >> 17) & 1
         high = v >> 18
@@ -301,7 +301,7 @@ class ThreeValue(object):
             self.low.as_number())
 
     def __repr__(self):
-        return "%r %d %s" % (
+        return "{} {} {}".format(
             self.high,
             self.padding_bit,
             self.low.as_bits_string())
@@ -334,41 +334,6 @@ def _calc_num_shift(instr):
         num_shift += 1
     return num_shift
 
-def _test_initial_order():
-    global edsac
-    edsac = Edsac()
-    edsac.load_initial_order()
-    edsac.set_cards_from_file()
-
-    for i in range(3): edsac.step() # put 10<<11 in R
-    assert edsac.multiplier.high.as_number() == 10 << 11
-
-    edsac.step() # 5: goto 6
-    assert edsac.sequence_control == 6
-
-    edsac.step()
-    edsac.step() # 7: read T(5) in m[0]
-    assert edsac.get_memory(0).bits[:5] == [0, 0, 1, 0, 1]
-    edsac.step() # 8: A += m[0]
-    assert edsac.get_accumulator().bits[:5] == [0, 0, 1, 0, 1]
-    edsac.step() # 9: ABC >>= 6
-    assert edsac.get_accumulator().as_bits_string() == "00000000101000000"
-    edsac.step() # 10: w[0] = AB; ABC=0
-    # m[0] is now 0
-    assert edsac.get_memory(0).as_number() == 0
-    edsac.step() # 11: read 1 into m[2]
-    assert edsac.get_memory(2).bits[:5] == [0, 0, 0, 0, 1]
-    edsac.step() # 12: A+=m[2]
-    assert edsac.get_accumulator().bits[:5] == [0, 0, 0, 0, 1]
-    edsac.step() # 13: A-=m[5]
-    assert edsac.get_memory(5).as_bits_string() == "00000000000001010"
-    print edsac.get_accumulator().as_bits_string()
-
-def _test():
-    import doctest
-    doctest.testmod()
-    _test_initial_order()
-
 def main():
     edsac = Edsac()
     edsac.load_initial_order()
@@ -377,5 +342,8 @@ def main():
 
 
 if __name__ == '__main__':
-    _test()
+    if 'test' in sys.argv:
+        print "Running tests..."
+        from tests import _test
+        _test()
     main()

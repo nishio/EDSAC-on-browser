@@ -104,7 +104,8 @@ class Edsac(object):
         self.next_char = 0
 
     def start(self):
-        # The 10-bit sequence control register (scr) holds address of next instruction
+        # The 10-bit sequence control register (scr)
+        # holds address of next instruction
         self.sequence_control = 0
         is_finished = False
         while not is_finished:
@@ -172,7 +173,7 @@ class Edsac(object):
             r = self.get_multiplier(wide)
             v = m.as_number() * r.as_number()
             if wide:
-                a = accumulator
+                a = self.accumulator
             else:
                 a = self.get_accumulator(wide=True)
             v += a.as_number()

@@ -10,6 +10,7 @@ BIT_MASK_17 = (1 << 17) - 1
 MIN_MEMORY_ADDR = 0
 MAX_MEMORY_ADDR = 1024
 
+
 class Edsac(object):
     def __init__(self):
         # 35bits word * 512
@@ -40,7 +41,7 @@ class Edsac(object):
             self.memory[address / 2] = value
         else:
             assert isinstance(value, Value)
-            is_high = address % 2 # m[1] is senior half of w[0]
+            is_high = address % 2  # m[1] is senior half of w[0]
             w = self.memory[address / 2]
             if is_high:
                 w.high = value
@@ -49,7 +50,7 @@ class Edsac(object):
 
     def get_memory(self, address, wide=False):
         assert MIN_MEMORY_ADDR <= address < MAX_MEMORY_ADDR
-        is_high = address % 2 # m[1] is senior half of w[0]
+        is_high = address % 2  # m[1] is senior half of w[0]
         word = self.memory[address / 2]
         if wide:
             assert is_high == 0
@@ -69,9 +70,9 @@ class Edsac(object):
         return senior 17 bit (A) or
         return senior 35 bit (AB)
         """
-        if wide: # AB
+        if wide:  # AB
             return self.accumulator.high
-        return self.accumulator.high.high # A
+        return self.accumulator.high.high  # A
 
     def set_accumulator(self, value, wide=False):
         if wide:
@@ -91,7 +92,7 @@ class Edsac(object):
         self.cards = []
         for line in open("square_card.txt"):
             if line == "\n":
-                continue # skip empty line
+                continue  # skip empty line
             self.cards.append(line[0])
 
         assert self.cards[0] == "T"
@@ -136,15 +137,16 @@ class Edsac(object):
 
         elif op == "E":
             # if A >= 0 goto n
-            if self.get_accumulator().bits[0] == 0: # A >= 0
+            if self.get_accumulator().bits[0] == 0:  # A >= 0
                 self.sequence_control = addr - 1
         elif op == "G":
             # if A < 0 goto n
-            if self.get_accumulator().bits[0] == 1: # A < 0
+            if self.get_accumulator().bits[0] == 1:  # A < 0
                 self.sequence_control = addr - 1
 
         elif op == "I":
-            # Place the next paper tape character in the least significant 5 bits of m[n].
+            #  Place the next paper tape character
+            #  in the least significant 5 bits of m[n].
             c = self.cards[self.next_char]
             self.next_char += 1
             v = _ascii_to_edsac(c)
@@ -219,9 +221,10 @@ class Edsac(object):
             print "output", self.get_memory(addr).as_character()
 
         elif op == "X":
-            pass # no operation
+            pass  # no operation
         elif op == "F":
-            raise NotImplementedError("Verify the last character output. What?")
+            raise NotImplementedError("Verify the last character"
+                                      "output. What?")
         elif op == "Z":
             # finish
             return True
@@ -229,7 +232,8 @@ class Edsac(object):
             raise AssertionError("Malformed Instruction:", instr.as_order())
 
         self.sequence_control += 1
-        return False # not finished
+        return False  # not finished
+
 
 class WideValue(object):
     "35bit words"
@@ -306,6 +310,7 @@ class ThreeValue(object):
             self.padding_bit,
             self.low.as_bits_string())
 
+
 def _calc_num_shift(instr):
     """
     >>> def test(s): return _calc_num_shift(Value.from_order_string(s))
@@ -333,6 +338,7 @@ def _calc_num_shift(instr):
     while bits[17 - num_shift] == 0:
         num_shift += 1
     return num_shift
+
 
 def main():
     edsac = Edsac()

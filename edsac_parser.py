@@ -13,6 +13,7 @@ ORDER_FORMAT = {
     'SL': 16
 }
 
+
 def _number2bits(number, width=HALF_WORD_LENGTH):
     result = []
     # round into 0 .. (1 << width) - 1
@@ -21,6 +22,7 @@ def _number2bits(number, width=HALF_WORD_LENGTH):
         result.insert(0, number & 1)
         number /= 2
     return result
+
 
 def _bits2number(bits):
     result = 0
@@ -42,18 +44,20 @@ FIGURES = '0123456789?#"+(*.$@;!\xa3,.&)/#-?:='
 assert len(LETTERS) == 32
 assert len(FIGURES) == 32
 
+
 def _ascii_to_edsac(c):
     """
     take a ascii character and return edsac code
     """
     assert isinstance(c, str) and len(c) == 1, c
     r = LETTERS.find(c)
-    if r == -1: # not found
+    if r == -1:  # not found
         r = FIGURES.find(c)
 
-    if r == -1: # not found again
+    if r == -1:  # not found again
         raise RuntimeError("unknown character %r" % c)
     return r
+
 
 class Value(object):
     """
@@ -142,7 +146,7 @@ class Value(object):
             self.bits[
                 ORDER_FORMAT['ADDRESS_START']: ORDER_FORMAT['ADDRESS_END']
             ]
-        ) # 6:16
+        )  # 6:16
         sl = 'SL'[self.bits[ORDER_FORMAT['SL']]]
         return (op, addr, sl)
 
@@ -209,6 +213,7 @@ class Value(object):
 
 ORDER_PATTERN = '([A-Z#!&@])(\d*)([SL])'
 
+
 def _test_parser():
     MAX_BITS_LINE_LENGTH = 20
     INITIAL_ORDER_LINE_STARTS = 21
@@ -227,6 +232,7 @@ def _test_parser():
             Value.from_order_string(order_str)
             .as_pretty_bits_string() == bits_str), line
 
+
 def _test():
     import doctest
     doctest.testmod()
@@ -234,4 +240,3 @@ def _test():
 if __name__ == '__main__':
     _test()
     _test_parser()
-

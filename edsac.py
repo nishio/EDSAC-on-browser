@@ -146,13 +146,13 @@ class Edsac(object):
 
         elif op == "I":
             #  Place the next paper tape character
-            #  in the least significant 5 bits of m[n].
+            #  in the *least* significant 5 bits of m[n].
             c = self.cards[self.next_char]
             self.next_char += 1
             v = _ascii_to_edsac(c)
             print "read", c
             bits = _number2bits(v, width=5)
-            self.get_memory(addr).bits[:5] = bits
+            self.get_memory(addr).bits[-5:] = bits
 
         elif op == "A":
             # AnS: A += m[n]

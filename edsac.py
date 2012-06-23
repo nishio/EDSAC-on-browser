@@ -151,8 +151,7 @@ class Edsac(object):
             self.next_char += 1
             v = _ascii_to_edsac(c)
             print "read", c
-            bits = _number2bits(v, width=5)
-            self.get_memory(addr).bits[-5:] = bits
+            self.set_memory(addr, Value.from_number(v))
 
         elif op == "A":
             # AnS: A += m[n]

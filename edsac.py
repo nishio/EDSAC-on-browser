@@ -340,6 +340,7 @@ def _calc_num_shift(instr):
 
 
 def main():
+    global edsac
     edsac = Edsac()
     edsac.load_initial_order()
     edsac.set_cards_from_file()
@@ -351,4 +352,12 @@ if __name__ == '__main__':
         print "Running tests..."
         from tests import _test
         _test()
-    main()
+    elif globals().get("DEBUG"):
+        # make easy debug on ipython
+        print "Running tests..."
+        import tests
+        reload(tests)
+        edsac = Edsac()
+        tests._test(edsac)
+    else:
+        main()

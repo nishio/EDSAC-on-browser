@@ -1,7 +1,6 @@
 from edsac import Edsac
 
-def _test_initial_order():
-    edsac = Edsac()
+def _test_initial_order(edsac):
     edsac.load_initial_order()
     edsac.set_cards_from_file()
 
@@ -32,10 +31,12 @@ def _test_initial_order():
     edsac.step() # 13: A-=m[5]
     assert edsac.get_memory(5).as_bits_string() == "00000000000001010"
     print edsac.get_accumulator().as_bits_string()
+    edsac.step() # 14: E21S (jump to 21 if it's not a number)
+    assert edsac.sequence_control == 15 # not jump
 
-def _test():
+def _test(edsac):
     import doctest
     doctest.testmod()
-    _test_initial_order()
+    _test_initial_order(edsac)
 
 

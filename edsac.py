@@ -3,37 +3,13 @@
 EDSAC emulator
 """
 import sys
-from edsac_parser import Value, _ascii_to_edsac, _number2bits, _bits2number
-
+from values import Value, real_to_unsigned #, _ascii_to_edsac, _number2bits, bits_to_unsigned
+from io import ascii_to_edsac  # used in "I" instraction
 
 BIT_MASK_17 = (1 << 17) - 1
 MIN_MEMORY_ADDR = 0
 MAX_MEMORY_ADDR = 1024
 
-#
-# Values
-
-def _real_to_int(v, bitwidth):
-    """
-    >>> _real_to_int(-0.5)
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    >>> _real_to_int(0.1875)
-    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    """
-    sign = 0
-    if v < 0:
-        sign = 1
-        v *= -1
-    buf = [sign]
-    for i in range(bitwidth - 1):
-        v *= 2
-        if v >= 1:
-            buf.append(1)
-            v -= 1
-        else:
-            buf.append(0)
-    print buf
-    return _bits2number(buf)
 
 class Edsac(object):
     def __init__(self):
@@ -172,7 +148,7 @@ class Edsac(object):
             #  in the *least* significant 5 bits of m[n].
             c = self.cards[self.next_char]
             self.next_char += 1
-            v = _ascii_to_edsac(c)
+            v = ascii_to_edsac(c)
             print "read", c
             self.set_memory(addr, Value.new_from_number(v))
 
@@ -200,7 +176,7 @@ class Edsac(object):
             else:
                 a = self.get_accumulator(wide=True)
             print "v", v
-            v = _real_to_int(v, 35) # bad idea
+            v = real_to_unsigned(v, 35) # bad idea
             print "v", v
             print "a", a.as_number()
             v += a.as_number()

@@ -3,7 +3,8 @@
 Edsac value representation
 
 Edsac has 17bit, 35bit and 71bit memory storage.
-We use 5 types of representation: list of 0 or 1, string of '0' '1' or ' ',
+We use 5 types of representation: list of 0 or 1 (called 'bits'),
+   string of '0' '1' or ' ' (called 'bit_string'),
    unsigned integer, signed integer and real.
 Conversation between those are 20 pattern. It's not good design.
 We use a mediator class 'Value' instead of storing directly.
@@ -12,6 +13,20 @@ from common import *
 import re
 from io import ascii_to_edsac, edsac_to_ascii
 
+def bits_to_unsigned(bits):
+    """
+    >>> bits_to_unsigned([1, 1, 1])
+    7
+    """
+    result = 0
+    for v in bits:
+        result *= 2
+        result += v
+    return result
+
+
+#
+# Values
 def _number2bits(number, width=HALF_WORD_LENGTH):
     result = []
     # round into 0 .. (1 << width) - 1
@@ -22,12 +37,30 @@ def _number2bits(number, width=HALF_WORD_LENGTH):
     return result
 
 
-def _bits2number(bits):
-    result = 0
-    for v in bits:
-        result *= 2
-        result += v
-    return result
+
+def real_to_bits(v, bitwidth=17):
+    """
+    >>> real_to_bits(-0.5)
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    >>> real_to_bits(0.1875)
+    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    """
+    sign = 0
+    if v < 0:
+        sign = 1
+        v *= -1
+    buf = [sign]
+    for i in range(bitwidth - 1):
+        v *= 2
+        if v >= 1:
+            buf.append(1)
+            v -= 1
+        else:
+            buf.append(0)
+    return buf
+
+def real_to_unsigned(v, bitwidth=17):
+    return bits_to_unsigned(real_to_bits(v, bitwidth))
 
 class Value(object):
     """
@@ -82,7 +115,7 @@ class Value(object):
         >>> Value.from_bits_string("11111111111101111").as_number()
         -17
         """
-        v = _bits2number(self.bits[1:])
+        v = bits_to_unsigned(self.bits[1:])
         if self.bits[0] == 1:
             v -= (1 << 16)
         return v
@@ -98,7 +131,7 @@ class Value(object):
         if self.bits[0] == 1:
             sign = -1
 
-        value = _bits2number(self.bits[1:])
+        value = bits_to_unsigned(self.bits[1:])
         return sign * value / float(1 << 16)
 
 
@@ -137,7 +170,7 @@ class Value(object):
             # 16 bits
             result = _number2bits(addr, 16) + sl
         return Value(result)
-        
+
     def as_order(self):
         """
         >>> x = Value.from_order(('R', 16, 'S'))
@@ -148,8 +181,8 @@ class Value(object):
         ('T', 11, 'L')
         """
         assert len(self.bits) == HALF_WORD_LENGTH
-        op = edsac_to_ascii(_bits2number(self.bits[:5]))
-        addr = _bits2number(
+        op = edsac_to_ascii(bits_to_unsigned(self.bits[:5]))
+        addr = bits_to_unsigned(
             self.bits[
                 ORDER_FORMAT['ADDRESS_START']: ORDER_FORMAT['ADDRESS_END']
             ]
@@ -204,7 +237,7 @@ class Value(object):
 
     def _as_character(self):
         # FIXME: switching letters/figures needed
-        return FIGURES[_bits2number(
+        return FIGURES[bits_to_unsigned(
             self.bits[ORDER_FORMAT['OP_START']: ORDER_FORMAT['OP_END']]
         )]
 

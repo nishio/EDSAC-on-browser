@@ -5,9 +5,10 @@ EDSAC emulator
 import sys
 from common import *
 from values import Value, WordValue, DoubleWordValue, real_to_unsigned #, _ascii_to_edsac, _number2bits, bits_to_unsigned
-from io import ascii_to_edsac  # used in "I" instraction
+import io
 import argparse
 SHOW_RUNNNING_INSTRUCTION = True
+REAL_OUTPUT = False
 
 class Edsac(object):
     def __init__(self):
@@ -20,6 +21,7 @@ class Edsac(object):
         self.cards = []
         self.next_char = 0
         self.sequence_control = 0
+        self.output = io.Output()
 
     def get_multiplier(self, wide=False):
         if wide:
@@ -152,8 +154,7 @@ class Edsac(object):
             #  in the *least* significant 5 bits of m[n].
             c = self.cards[self.next_char]
             self.next_char += 1
-            v = ascii_to_edsac(c)
-            print "read", c
+            v = io.ascii_to_edsac(c)
             self.set_memory(addr, Value.new_from_number(v))
 
         elif op == "A":
@@ -219,7 +220,14 @@ class Edsac(object):
 
         elif op == "O":
             # output
-            print "output", self.get_memory(addr).as_character()
+            if REAL_OUTPUT:
+                sys.stdout.write(
+                    self.output(
+                    self.get_memory(addr).as_charcode()))
+            else:
+                code = self.get_memory(addr).as_charcode()
+                print "output %s %s %s" % (
+                    io.edsac_to_letter(code), io.edsac_to_figure(code), code)
 
         elif op == "X":
             pass  # no operation
@@ -284,9 +292,17 @@ if __name__ == '__main__':
                         dest='show_runnning_instruction',
                         action='store_true',
                         help='show runnning instruction')
+    parser.add_argument('--real-output',
+                        dest='real_output',
+                        action='store_true',
+                        help='use real output instead of verbose debug print')
 
     args = parser.parse_args()
     SHOW_RUNNNING_INSTRUCTION = args.show_runnning_instruction
+    if args.real_output:
+        REAL_OUTPUT = True
+        SHOW_RUNNNING_INSTRUCTION = False
+
     if args.test:
         print "Running tests..."
         from tests import _test

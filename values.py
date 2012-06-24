@@ -11,7 +11,7 @@ We use a mediator class 'Value' instead of storing directly.
 """
 from common import *
 import re
-from io import ascii_to_edsac, edsac_to_ascii, output
+from io import ascii_to_edsac, edsac_to_letter
 
 def bits_to_unsigned(bits):
     """
@@ -194,7 +194,7 @@ class Value(object):
         ('T', 11, 'L')
         """
         assert len(self.bits) == HALF_WORD_LENGTH
-        op = edsac_to_ascii(bits_to_unsigned(self.bits[:5]))
+        op = edsac_to_letter(bits_to_unsigned(self.bits[:5]))
         addr = bits_to_unsigned(
             self.bits[
                 ORDER_FORMAT['ADDRESS_START']: ORDER_FORMAT['ADDRESS_END']
@@ -248,11 +248,10 @@ class Value(object):
         addr = int(addr)
         return Value.from_order((op, addr, sl))
 
-    def as_character(self):
-        # FIXME: switching letters/figures needed
-        return output(bits_to_unsigned(
+    def as_charcode(self):
+        return bits_to_unsigned(
             self.bits[ORDER_FORMAT['OP_START']: ORDER_FORMAT['OP_END']]
-        ))
+        )
 
     def __add__(self, v):
         Assert(self.bitwidth).equal(v.bitwidth);

@@ -27,11 +27,11 @@ TODO
 - most high bit of tape is complemented. write test.
 - complete "_test_initial_order()" (now on line 13)
 
-- Values are treated as 4 types: list of 0/1, string of 0/1/space, unsigned integer, signed interger and real.
+- Values are treated as 5 types: list of 0/1, string of 0/1/space, unsigned integer, signed interger and real.
   Current design are too ad hoc.
 - classess Value, WideValue and ThreeValue are ugly, it is because I didn't notice ABC is 1.5 words width.
 - repr should return eval-able string
-  
+
 =======
 
 MIT License

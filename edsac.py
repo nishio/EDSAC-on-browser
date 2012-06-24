@@ -6,8 +6,8 @@ import sys
 from common import *
 from values import Value, WordValue, DoubleWordValue, real_to_unsigned #, _ascii_to_edsac, _number2bits, bits_to_unsigned
 from io import ascii_to_edsac  # used in "I" instraction
-
-
+import argparse
+SHOW_RUNNNING_INSTRUCTION = True
 
 class Edsac(object):
     def __init__(self):
@@ -116,8 +116,9 @@ class Edsac(object):
         assert MIN_MEMORY_ADDR <= self.sequence_control < MAX_MEMORY_ADDR
         instr = self.get_memory(self.sequence_control)
         # debug
-        print self.accumulator
-        print self.sequence_control, instr.as_order()
+        if SHOW_RUNNNING_INSTRUCTION:
+            print self.sequence_control, instr.as_order()
+
         op, addr, sl = instr.as_order()
         wide = (sl == "L")
 
@@ -274,7 +275,18 @@ def main():
 
 
 if __name__ == '__main__':
-    if 'test' in sys.argv:
+    parser = argparse.ArgumentParser(
+        description='EDSAC Simulator.')
+    parser.add_argument('-t', dest='test', action='store_true',
+                        help='run tests')
+    parser.add_argument('--show-runnning-instruction',
+                        dest='show_runnning_instruction',
+                        action='store_true',
+                        help='show runnning instruction')
+
+    args = parser.parse_args()
+    SHOW_RUNNNING_INSTRUCTION = args.show_runnning_instruction
+    if args.test:
         print "Running tests..."
         from tests import _test
         edsac = Edsac()

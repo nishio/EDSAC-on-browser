@@ -76,7 +76,24 @@ def _test_initial_order(edsac):
         line = fi.readline()
         expected = line[:20]
         Assert(edsac.get_memory(addr)).equal(expected)
-    print "ok"
+
+    # test
+    while edsac.sequence_control != 97:
+        edsac.step()
+    print edsac.get_memory(76)
+    print edsac.get_multiplier()
+    import values
+    #edsac.set_multiplier(values.WordValue(), wide=True)
+    print edsac.set_memory(76, values.Value.new_from_number(6))
+    edsac.step() # 97: R += m[76]
+    print edsac.get_memory(76)
+    print edsac.get_multiplier()
+    print edsac.accumulator
+    edsac.step() # 98: ABC+=m[76]*RS
+    print edsac.accumulator
+    edsac.step()
+    edsac.step()
+    print edsac.accumulator
 
 def _test(edsac):
     import doctest

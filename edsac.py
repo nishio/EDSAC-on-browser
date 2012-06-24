@@ -175,9 +175,10 @@ class Edsac(object):
             v = m.as_real() * r.as_real()
             if wide:
                 a = self.accumulator
+                v = real_to_unsigned(v, 71) # bad idea
             else:
                 a = self.get_accumulator(wide=True)
-            v = real_to_unsigned(v, 35) # bad idea
+                v = real_to_unsigned(v, 35) # bad idea
             v += a.as_integer()
             a.set_from_number(v)
 
@@ -209,7 +210,7 @@ class Edsac(object):
         elif op == "U":
             # UnS: m[n]=A
             # UnL: w[n]=AB
-            self.set_memory(addr, self.get_accumulator(wide))
+            self.set_memory(addr, self.get_accumulator(wide), wide)
 
         elif op == "C":
             raise NotImplementedError

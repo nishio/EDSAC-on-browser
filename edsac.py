@@ -169,24 +169,15 @@ class Edsac(object):
 
         elif op == "V":
             m = self.get_memory(addr, wide)
-            print "m", m
             r = self.get_multiplier(wide)
-            print "r", r
             v = m.as_real() * r.as_real()
             if wide:
                 a = self.accumulator
             else:
                 a = self.get_accumulator(wide=True)
-            print "v", v
             v = real_to_unsigned(v, 35) # bad idea
-            print "v", v
-            print "a", a.as_integer()
             v += a.as_integer()
-            print "v", v
-            #import pdb
-            #pdb.set_trace()
             a.set_from_number(v)
-            print "a", a
 
         elif op == "N":
             m = self.get_memory(addr, wide)
@@ -210,9 +201,7 @@ class Edsac(object):
             # Shift left
             num_shift = _calc_num_shift(instr)
             v = self.accumulator.as_unsigned()
-            print "v", v
             v = v << num_shift
-            print "v", v
             self.accumulator.set_from_number(v)
 
         elif op == "U":

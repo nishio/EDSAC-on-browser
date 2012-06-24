@@ -30,6 +30,7 @@ class Edsac(object):
         if wide:
             assert isinstance(value, WordValue)
             self.multiplier = value
+        assert isinstance(value, Value)
         self.multiplier.high = value
 
     def set_memory(self, address, value, wide=False):
@@ -179,8 +180,8 @@ class Edsac(object):
             print "v", v
             v = real_to_unsigned(v, 35) # bad idea
             print "v", v
-            print "a", a.as_number()
-            v += a.as_number()
+            print "a", a.as_integer()
+            v += a.as_integer()
             print "v", v
             #import pdb
             #pdb.set_trace()
@@ -190,26 +191,28 @@ class Edsac(object):
         elif op == "N":
             m = self.get_memory(addr, wide)
             r = self.get_multiplier(wide)
-            v = m.as_number() * r.as_number()
+            v = m.as_integer() * r.as_integer()
             if wide:
                 a = self.accumulator
             else:
                 a = self.get_accumulator(wide=True)
-            v -= a.as_number()
+            v -= a.as_integer()
             a.set_from_number(v)
 
         elif op == "R":
             # Shift right
             num_shift = _calc_num_shift(instr)
-            v = self.accumulator.as_number()
+            v = self.accumulator.as_integer()
             v = v >> num_shift
             self.accumulator.set_from_number(v)
 
         elif op == "L":
             # Shift left
             num_shift = _calc_num_shift(instr)
-            v = self.accumulator.as_number()
+            v = self.accumulator.as_unsigned()
+            print "v", v
             v = v << num_shift
+            print "v", v
             self.accumulator.set_from_number(v)
 
         elif op == "U":

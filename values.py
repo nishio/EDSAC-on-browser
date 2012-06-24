@@ -62,12 +62,22 @@ def real_to_bits(v, bitwidth=17):
 def real_to_unsigned(v, bitwidth=17):
     return bits_to_unsigned(real_to_bits(v, bitwidth))
 
+
+def _max_int(bitwidth):
+    return (1 << (bitwidth - 1)) - 1
+
+def _int_ubound(bitwidth):
+    return 1 << (bitwidth - 1)
+
+def _bit_mask(bitwidth):
+    return (1 << bitwidth) - 1
+
 class Value(object):
     """
     Value object hold 17 bits.
     It can construct from number, order_string, order
 
-    >>> Value().as_number()
+    >>> Value().as_integer()
     0
     """
     bitwidth = 17
@@ -85,7 +95,7 @@ class Value(object):
         >>> x = Value.new_from_number(1234)
         >>> x.bits
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
-        >>> x.as_number()
+        >>> x.as_integer()
         1234
         """
         return Value(_number2bits(v))
@@ -95,32 +105,39 @@ class Value(object):
         >>> x = Value.new_from_number(1234)
         >>> x.bits
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
-        >>> x.as_number()
+        >>> x.as_integer()
         1234
         """
         sign_bit = 0
-        if v < 0 or v > (1 << 16):
+        if v < 0 or v > _max_int(self.bitwidth):
             sign_bit = 1
 
-        self.bits = [sign_bit] + _number2bits(v, 16)
+        self.bits = [sign_bit] + _number2bits(v, self.bitwidth - 1)
         return self
 
-    def as_number(self):
+    def as_integer(self):
         """
         >>> x = Value.new_from_number(1234)
         >>> x.bits
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
-        >>> x.as_number()
+        >>> x.as_integer()
         1234
-        >>> Value.from_bits_string("00000000000100001").as_number()
+        >>> Value.from_bits_string("00000000000100001").as_integer()
         33
-        >>> Value.from_bits_string("11111111111101111").as_number()
+        >>> Value.from_bits_string("11111111111101111").as_integer()
         -17
         """
         v = bits_to_unsigned(self.bits[1:])
         if self.bits[0] == 1:
-            v -= (1 << 16)
+            v -= _int_ubound(self.bitwidth)
         return v
+
+    def as_unsigned(self):
+        """
+        >>> Value.from_bits_string("11111111111101111").as_unsigned()
+        131055
+        """
+        return bits_to_unsigned(self.bits)
 
     def as_real(self):
         """
@@ -134,7 +151,7 @@ class Value(object):
             sign = -1
 
         value = bits_to_unsigned(self.bits[1:])
-        return sign * value / float(1 << 16)
+        return sign * value / float(_int_ubound(self.bitwidth))
 
 
     @staticmethod
@@ -244,36 +261,53 @@ class Value(object):
         )]
 
     def __add__(self, v):
-        assert isinstance(v, Value)
+        Assert(self.bitwidth).equal(v.bitwidth);
         return Value.new_from_number(
-            self.as_number() + v.as_number())
+            self.as_integer() + v.as_integer())
 
     def __sub__(self, v):
-        assert isinstance(v, Value)
+        Assert(self.bitwidth).equal(v.bitwidth);
         return Value.new_from_number(
-            self.as_number() - v.as_number())
+            self.as_integer() - v.as_integer())
 
     def is_negative(self):
         return (self.bits[0] == 1)
 
+def _empty_storage(bitwidth):
+    if bitwidth == 17:
+        return Value()
+    elif bitwidth == 35:
+        return WordValue()
+    else:
+        raise AssertionError("17bit or 35bit required")
+
 class WordValue(Value):
     "35bit words"
-    bitwidth = 31
+    bitwidth = 35
+    halfwidth = 17 # (35 - 1) / 2
     def __init__(self, high=None, low=None, padding_bit=0):
         if not high:
-            high = Value()
+            high = _empty_storage(self.halfwidth)
         if not low:
-            low = Value()
+            low = _empty_storage(self.halfwidth)
+        Assert(high.bitwidth).equal(self.halfwidth)
+        Assert(low.bitwidth).equal(self.halfwidth)
         self.high = high
         self.low = low
         self.padding_bit = padding_bit
 
-    def as_number(self):
+    def as_integer(self):
         return (
-            (self.high.as_number() << 18) +
-            (self.padding_bit << 17) +
-            self.low.as_number())
+            (self.high.as_integer() << (self.halfwidth + 1)) +
+            (self.padding_bit << self.halfwidth) +
+            self.low.as_integer())
 
+    def as_unsigned(self):
+        return (
+            (self.high.as_unsigned() << (self.halfwidth + 1)) +
+            (self.padding_bit << self.halfwidth) +
+            self.low.as_unsigned())
+    
     @staticmethod
     def new_from_number(v):
         assert isinstance(v, int) or isinstance(v, long), v
@@ -283,18 +317,13 @@ class WordValue(Value):
 
     def set_from_number(self, v):
         assert isinstance(v, int) or isinstance(v, long), v
-        low = v & BIT_MASK_17
-        padding_bit = (v >> 17) & 1
-        high = v >> 18
+        low = v & _bit_mask(self.halfwidth)
+        padding_bit = (v >> self.halfwidth) & 1
+        high = v >> (self.halfwidth + 1)
         self.high.set_from_number(high)
         self.low.set_from_number(low)
         self.padding_bit = padding_bit
         return self
-
-    def __add__(self, v):
-        assert isinstance(v, WordValue)
-        return WordValue.new_from_number(
-            self.as_number() + v.as_number())
 
     def __repr__(self):
         return "{} {} {}".format(
@@ -303,34 +332,15 @@ class WordValue(Value):
             self.low.as_bits_string())
 
 
-class DoubleWordValue(Value):
+class DoubleWordValue(WordValue):
     """
     71-bit register (for accumlator)
     """
     bitwidth = 71
-    def __init__(self, high=None, low=None, padding_bit=0):
-        if not high:
-            high = WordValue()
-        if not low:
-            low = WordValue()
-        self.high = high
-        self.padding_bit = padding_bit
-        self.low = low
+    halfwidth = 35 # (71 - 1) / 2
 
-    def set_from_number(self, v):
-        assert isinstance(v, int) or isinstance(v, long), v
-        low = v & BIT_MASK_17
-        padding_bit = (v >> 17) & 1
-        high = v >> 18
-        self.high = WordValue.new_from_number(high)
-        self.low = Value.new_from_number(low)
-        self.padding_bit = padding_bit
-
-    def as_number(self):
-        return (
-            (self.high.as_number() << 36) +
-            (self.padding_bit << 35) +
-            self.low.as_number())
+    # inherit as_integer
+    # inherit set_from_number
 
     def __repr__(self):
         return "{} {} {}".format(

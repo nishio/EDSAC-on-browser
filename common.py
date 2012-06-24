@@ -3,7 +3,6 @@
 edsac common part
 """
 HALF_WORD_LENGTH = 17
-BIT_MASK_17 = (1 << 17) - 1
 MIN_MEMORY_ADDR = 0
 MAX_MEMORY_ADDR = 1024
 

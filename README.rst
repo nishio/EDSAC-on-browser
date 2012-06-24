@@ -43,8 +43,13 @@ Reference
 =========
 
 - http://www.cl.cam.ac.uk/~mr/edsacposter.pdf
-  code of initial order and square are come from this poster.
-  "11100 0 0000100010 0 62 S34S" seems typo of "01100 ..."
+
+  - code of initial order and square are come from this poster.
+  - "11100 0 0000100010 0 62 S34S" seems typo of "01100 ..."
+  - It said HnS is 'R += m[n]', however EdsacTG.pdf said it is 'R = m[n]'.
+    If '+=' is correct, on '97: H76S', result is affected by value which stored on R during initial order.
+    I choose 'R = m[n]'.
+
 - http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
 - http://www.cs.clemson.edu/~mark/edsac.html
 - http://www.dcs.warwick.ac.uk/~edsac/Software/EdsacTG.pdf

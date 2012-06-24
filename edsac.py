@@ -133,7 +133,7 @@ class Edsac(object):
             # HnL: RS += w[n]
             m = self.get_memory(addr, wide)
             r = self.get_multiplier(wide)
-            r = m + r
+            r = m
             self.set_multiplier(r, wide)
 
         elif op == "E":

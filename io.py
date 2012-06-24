@@ -31,3 +31,9 @@ def edsac_to_ascii(c):
     assert isinstance(c, int) and 0 <= c < MAX_CHAR_CODE
     # FIXME: switching letters/figures needed
     return LETTERS[c]
+
+output_mode = "FIGURES"
+def output(c):
+    global output_mode
+    assert isinstance(c, int) and 0 <= c < MAX_CHAR_CODE
+    return FIGURES[c]

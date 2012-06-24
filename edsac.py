@@ -3,22 +3,20 @@
 EDSAC emulator
 """
 import sys
-from values import Value, real_to_unsigned #, _ascii_to_edsac, _number2bits, bits_to_unsigned
+from common import *
+from values import Value, WordValue, DoubleWordValue, real_to_unsigned #, _ascii_to_edsac, _number2bits, bits_to_unsigned
 from io import ascii_to_edsac  # used in "I" instraction
 
-BIT_MASK_17 = (1 << 17) - 1
-MIN_MEMORY_ADDR = 0
-MAX_MEMORY_ADDR = 1024
 
 
 class Edsac(object):
     def __init__(self):
         # 35bits word * 512
-        self.memory = [WideValue() for i in range(512)]
+        self.memory = [WordValue() for i in range(512)]
         # ABC register: 71bits accumulator
-        self.accumulator = ThreeValue()
+        self.accumulator = DoubleWordValue()
         # RC register: 35bits multiplier
-        self.multiplier = WideValue()
+        self.multiplier = WordValue()
         self.cards = []
         self.next_char = 0
         self.sequence_control = 0
@@ -30,14 +28,14 @@ class Edsac(object):
 
     def set_multiplier(self, value, wide=False):
         if wide:
-            assert isinstance(value, WideValue)
+            assert isinstance(value, WordValue)
             self.multiplier = value
         self.multiplier.high = value
 
     def set_memory(self, address, value, wide=False):
         assert 0 <= address < 1024
         if wide:
-            assert isinstance(value, WideValue)
+            assert isinstance(value, WordValue)
             self.memory[address / 2] = value
         else:
             assert isinstance(value, Value)
@@ -76,7 +74,7 @@ class Edsac(object):
 
     def set_accumulator(self, value, wide=False):
         if wide:
-            assert isinstance(value, WideValue)
+            assert isinstance(value, WordValue)
             self.accumulator.high = value
         else:
             assert isinstance(value, Value)
@@ -124,7 +122,8 @@ class Edsac(object):
         if op == "T":
             # TnS: m[n]=A; ABC=0
             # TnL: w[n]=AB; ABC=0
-            self.set_memory(addr, self.get_accumulator(wide), wide)
+            a = self.get_accumulator(wide)
+            self.set_memory(addr, a, wide)
             self.clear_accumulator()
         elif op == "H":
             # HnS: R += m[n]
@@ -136,11 +135,13 @@ class Edsac(object):
 
         elif op == "E":
             # if A >= 0 goto n
-            if self.get_accumulator().bits[0] == 0:  # A >= 0
+            a = self.get_accumulator()
+            if not a.is_negative():  # A >= 0
                 self.sequence_control = addr - 1
         elif op == "G":
             # if A < 0 goto n
-            if self.get_accumulator().bits[0] == 1:  # A < 0
+            a = self.get_accumulator()
+            if a.is_negative():  # A < 0
                 self.sequence_control = addr - 1
 
         elif op == "I":
@@ -181,8 +182,8 @@ class Edsac(object):
             print "a", a.as_number()
             v += a.as_number()
             print "v", v
-            import pdb
-            pdb.set_trace()
+            #import pdb
+            #pdb.set_trace()
             a.set_from_number(v)
             print "a", a
 
@@ -240,85 +241,6 @@ class Edsac(object):
         return False  # not finished
 
 
-class WideValue(object):
-    "35bit words"
-    def __init__(self, high=None, low=None, padding_bit=0):
-        if not high:
-            high = Value()
-        if not low:
-            low = Value()
-        self.high = high
-        self.low = low
-        self.padding_bit = padding_bit
-
-    def as_number(self):
-        return (
-            (self.high.as_number() << 18) +
-            (self.padding_bit << 17) +
-            self.low.as_number())
-
-    @staticmethod
-    def new_from_number(v):
-        assert isinstance(v, int) or isinstance(v, long), v
-        ret = WideValue()
-        ret.set_from_number(v)
-        return ret
-
-    def set_from_number(self, v):
-        assert isinstance(v, int) or isinstance(v, long), v
-        low = v & BIT_MASK_17
-        padding_bit = (v >> 17) & 1
-        high = v >> 18
-        self.high.set_from_number(high)
-        self.low.set_from_number(low)
-        self.padding_bit = padding_bit
-        return self
-
-    def __add__(self, v):
-        assert isinstance(v, WideValue)
-        return WideValue.new_from_number(
-            self.as_number() + v.as_number())
-
-    def __repr__(self):
-        return "{} {} {}".format(
-            self.high.as_bits_string(),
-            self.padding_bit,
-            self.low.as_bits_string())
-
-
-class ThreeValue(object):
-    """
-    71-bit register (for accumlator)
-    """
-    def __init__(self, high=None, low=None, padding_bit=0):
-        if not high:
-            high = Value()
-        if not low:
-            low = Value()
-        self.high = WideValue()
-        self.padding_bit = padding_bit
-        self.low = Value()
-
-    def set_from_number(self, v):
-        assert isinstance(v, int) or isinstance(v, long), v
-        low = v & BIT_MASK_17
-        padding_bit = (v >> 17) & 1
-        high = v >> 18
-        self.high = WideValue.new_from_number(high)
-        self.low = Value.new_from_number(low)
-        self.padding_bit = padding_bit
-
-    def as_number(self):
-        return (
-            (self.high.as_number() << 18) +
-            (self.padding_bit << 17) +
-            self.low.as_number())
-
-    def __repr__(self):
-        return "{} {} {}".format(
-            self.high,
-            self.padding_bit,
-            self.low.as_bits_string())
 
 
 def _calc_num_shift(instr):

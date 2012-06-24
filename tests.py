@@ -1,5 +1,6 @@
 from edsac import Edsac
 
+
 def _test_initial_order(edsac):
     edsac.load_initial_order()
     edsac.set_cards_from_file()
@@ -18,13 +19,14 @@ def _test_initial_order(edsac):
     edsac.step() # 8: A += m[0]
     assert edsac.get_accumulator().bits[-5:] == [0, 0, 1, 0, 1]
     edsac.step() # 9: ABC >>= 6
-    assert repr(edsac.get_accumulator(True)) == "00000000000000000 0 00101000000000000"
+    print edsac.get_accumulator(True)
+    assert repr(edsac.get_accumulator(True)) == "00101000000000000 0 00000000000000000"
     edsac.step() # 10: w[0] = AB; ABC=0
     # (9, 10) Shift and store it, so that it becomes the senior 5 bit of m[0]
     assert repr(edsac.get_memory(0)) == "00101 0 0000000000 0"
     # m[1] is now 0
     assert edsac.get_memory(1).as_number() == 0
-    
+
     edsac.step() # 11: read 1 into m[2]
     assert edsac.get_memory(2).bits[-5:] == [0, 0, 0, 0, 1]
     edsac.step() # 12: A+=m[2]
@@ -62,4 +64,6 @@ def _test(edsac):
     doctest.testmod()
     _test_initial_order(edsac)
 
-
+if __name__ == "__main__":
+    edsac = Edsac()
+    _test(edsac)

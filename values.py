@@ -70,6 +70,8 @@ class Value(object):
     >>> Value().as_number()
     0
     """
+    bitwidth = 17
+
     def __init__(self, bits=None):
         if bits:
             assert len(bits) == HALF_WORD_LENGTH
@@ -250,6 +252,91 @@ class Value(object):
         assert isinstance(v, Value)
         return Value.new_from_number(
             self.as_number() - v.as_number())
+
+    def is_negative(self):
+        return (self.bits[0] == 1)
+
+class WordValue(Value):  # TODO: rename to WordValue
+    "35bit words"
+    bitwidth = 31
+    def __init__(self, high=None, low=None, padding_bit=0):
+        if not high:
+            high = Value()
+        if not low:
+            low = Value()
+        self.high = high
+        self.low = low
+        self.padding_bit = padding_bit
+
+    def as_number(self):
+        return (
+            (self.high.as_number() << 18) +
+            (self.padding_bit << 17) +
+            self.low.as_number())
+
+    @staticmethod
+    def new_from_number(v):
+        assert isinstance(v, int) or isinstance(v, long), v
+        ret = WordValue()
+        ret.set_from_number(v)
+        return ret
+
+    def set_from_number(self, v):
+        assert isinstance(v, int) or isinstance(v, long), v
+        low = v & BIT_MASK_17
+        padding_bit = (v >> 17) & 1
+        high = v >> 18
+        self.high.set_from_number(high)
+        self.low.set_from_number(low)
+        self.padding_bit = padding_bit
+        return self
+
+    def __add__(self, v):
+        assert isinstance(v, WordValue)
+        return WordValue.new_from_number(
+            self.as_number() + v.as_number())
+
+    def __repr__(self):
+        return "{} {} {}".format(
+            self.high.as_bits_string(),
+            self.padding_bit,
+            self.low.as_bits_string())
+
+
+class DoubleWordValue(Value):  #TODO rename to DoubleWordValue
+    """
+    71-bit register (for accumlator)
+    """
+    bitwidth = 71
+    def __init__(self, high=None, low=None, padding_bit=0):
+        if not high:
+            high = WordValue()
+        if not low:
+            low = WordValue()
+        self.high = high
+        self.padding_bit = padding_bit
+        self.low = low
+
+    def set_from_number(self, v):
+        assert isinstance(v, int) or isinstance(v, long), v
+        low = v & BIT_MASK_17
+        padding_bit = (v >> 17) & 1
+        high = v >> 18
+        self.high = WordValue.new_from_number(high)
+        self.low = Value.new_from_number(low)
+        self.padding_bit = padding_bit
+
+    def as_number(self):
+        return (
+            (self.high.as_number() << 36) +
+            (self.padding_bit << 35) +
+            self.low.as_number())
+
+    def __repr__(self):
+        return "{} {} {}".format(
+            self.high,
+            self.padding_bit,
+            self.low)
 
 
 def _test_parser():

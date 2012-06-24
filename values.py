@@ -146,13 +146,7 @@ class Value(object):
         >>> Value.from_bits_string("11000000000000000").as_real()
         -0.5
         """
-        sign = 1
-        if self.bits[0] == 1:
-            sign = -1
-
-        value = bits_to_unsigned(self.bits[1:])
-        return sign * value / float(_int_ubound(self.bitwidth))
-
+        return self.as_integer() / float(_int_ubound(self.bitwidth))
 
     @staticmethod
     def from_order(order):

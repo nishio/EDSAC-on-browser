@@ -1,11 +1,6 @@
+from common import *
 from edsac import Edsac
 
-class Assert(object):
-    def __init__(self, value):
-        self.value = value
-
-    def equal(self, v):
-        assert self.value == v, "expect %r but %r" % (v, self.value)
 
 def _test_initial_order(edsac):
     edsac.load_initial_order()

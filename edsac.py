@@ -3,22 +3,20 @@
 EDSAC emulator
 """
 import sys
-from edsac_parser import Value, _ascii_to_edsac, _number2bits
+from common import *
+from values import Value, WordValue, DoubleWordValue, real_to_unsigned #, _ascii_to_edsac, _number2bits, bits_to_unsigned
+from io import ascii_to_edsac  # used in "I" instraction
 
-
-BIT_MASK_17 = (1 << 17) - 1
-MIN_MEMORY_ADDR = 0
-MAX_MEMORY_ADDR = 1024
 
 
 class Edsac(object):
     def __init__(self):
         # 35bits word * 512
-        self.memory = [WideValue() for i in range(512)]
+        self.memory = [WordValue() for i in range(512)]
         # ABC register: 71bits accumulator
-        self.accumulator = ThreeValue()
+        self.accumulator = DoubleWordValue()
         # RC register: 35bits multiplier
-        self.multiplier = WideValue()
+        self.multiplier = WordValue()
         self.cards = []
         self.next_char = 0
         self.sequence_control = 0
@@ -30,14 +28,15 @@ class Edsac(object):
 
     def set_multiplier(self, value, wide=False):
         if wide:
-            assert isinstance(value, WideValue)
+            assert isinstance(value, WordValue)
             self.multiplier = value
+        assert isinstance(value, Value)
         self.multiplier.high = value
 
     def set_memory(self, address, value, wide=False):
         assert 0 <= address < 1024
         if wide:
-            assert isinstance(value, WideValue)
+            assert isinstance(value, WordValue)
             self.memory[address / 2] = value
         else:
             assert isinstance(value, Value)
@@ -76,7 +75,7 @@ class Edsac(object):
 
     def set_accumulator(self, value, wide=False):
         if wide:
-            assert isinstance(value, WideValue)
+            assert isinstance(value, WordValue)
             self.accumulator.high = value
         else:
             assert isinstance(value, Value)
@@ -120,12 +119,12 @@ class Edsac(object):
         print self.sequence_control, instr.as_order()
         op, addr, sl = instr.as_order()
         wide = (sl == "L")
-        if self.sequence_control == 13:
-            print self.get_accumulator()
+
         if op == "T":
             # TnS: m[n]=A; ABC=0
             # TnL: w[n]=AB; ABC=0
-            self.set_memory(addr, self.get_accumulator(wide), wide)
+            a = self.get_accumulator(wide)
+            self.set_memory(addr, a, wide)
             self.clear_accumulator()
         elif op == "H":
             # HnS: R += m[n]
@@ -137,11 +136,13 @@ class Edsac(object):
 
         elif op == "E":
             # if A >= 0 goto n
-            if self.get_accumulator().bits[0] == 0:  # A >= 0
+            a = self.get_accumulator()
+            if not a.is_negative():  # A >= 0
                 self.sequence_control = addr - 1
         elif op == "G":
             # if A < 0 goto n
-            if self.get_accumulator().bits[0] == 1:  # A < 0
+            a = self.get_accumulator()
+            if a.is_negative():  # A < 0
                 self.sequence_control = addr - 1
 
         elif op == "I":
@@ -149,7 +150,7 @@ class Edsac(object):
             #  in the *least* significant 5 bits of m[n].
             c = self.cards[self.next_char]
             self.next_char += 1
-            v = _ascii_to_edsac(c)
+            v = ascii_to_edsac(c)
             print "read", c
             self.set_memory(addr, Value.new_from_number(v))
 
@@ -158,7 +159,7 @@ class Edsac(object):
             # AnL: AB += w[n]
             m = self.get_memory(addr, wide)
             r = self.get_accumulator(wide)
-            r = m + r
+            r = r + m
             self.set_accumulator(r, wide)
         elif op == "S":
             m = self.get_memory(addr, wide)
@@ -168,37 +169,50 @@ class Edsac(object):
 
         elif op == "V":
             m = self.get_memory(addr, wide)
+            print "m", m
             r = self.get_multiplier(wide)
-            v = m.as_number() * r.as_number()
+            print "r", r
+            v = m.as_real() * r.as_real()
             if wide:
                 a = self.accumulator
             else:
                 a = self.get_accumulator(wide=True)
-            v += a.as_number()
+            print "v", v
+            v = real_to_unsigned(v, 35) # bad idea
+            print "v", v
+            print "a", a.as_integer()
+            v += a.as_integer()
+            print "v", v
+            #import pdb
+            #pdb.set_trace()
             a.set_from_number(v)
+            print "a", a
+
         elif op == "N":
             m = self.get_memory(addr, wide)
             r = self.get_multiplier(wide)
-            v = m.as_number() * r.as_number()
+            v = m.as_integer() * r.as_integer()
             if wide:
                 a = self.accumulator
             else:
                 a = self.get_accumulator(wide=True)
-            v -= a.as_number()
+            v -= a.as_integer()
             a.set_from_number(v)
 
         elif op == "R":
             # Shift right
             num_shift = _calc_num_shift(instr)
-            v = self.accumulator.as_number()
+            v = self.accumulator.as_integer()
             v = v >> num_shift
             self.accumulator.set_from_number(v)
 
         elif op == "L":
             # Shift left
             num_shift = _calc_num_shift(instr)
-            v = self.accumulator.as_number()
+            v = self.accumulator.as_unsigned()
+            print "v", v
             v = v << num_shift
+            print "v", v
             self.accumulator.set_from_number(v)
 
         elif op == "U":
@@ -230,85 +244,6 @@ class Edsac(object):
         return False  # not finished
 
 
-class WideValue(object):
-    "35bit words"
-    def __init__(self, high=None, low=None, padding_bit=0):
-        if not high:
-            high = Value()
-        if not low:
-            low = Value()
-        self.high = high
-        self.low = low
-        self.padding_bit = padding_bit
-
-    def as_number(self):
-        return (
-            (self.high.as_number() << 18) +
-            (self.padding_bit << 17) +
-            self.low.as_number())
-
-    @staticmethod
-    def new_from_number(v):
-        assert isinstance(v, int) or isinstance(v, long), v
-        ret = WideValue()
-        ret.set_from_number(v)
-        return ret
-
-    def set_from_number(self, v):
-        assert isinstance(v, int) or isinstance(v, long), v
-        low = v & BIT_MASK_17
-        padding_bit = (v >> 17) & 1
-        high = v >> 18
-        self.high.set_from_number(high)
-        self.low.set_from_number(low)
-        self.padding_bit = padding_bit
-        return self
-
-    def __add__(self, v):
-        assert isinstance(v, WideValue)
-        return WideValue.new_from_number(
-            self.as_number() + v.as_number())
-
-    def __repr__(self):
-        return "{} {} {}".format(
-            self.high.as_bits_string(),
-            self.padding_bit,
-            self.low.as_bits_string())
-
-
-class ThreeValue(object):
-    """
-    71-bit register (for accumlator)
-    """
-    def __init__(self, high=None, low=None, padding_bit=0):
-        if not high:
-            high = Value()
-        if not low:
-            low = Value()
-        self.high = WideValue()
-        self.padding_bit = padding_bit
-        self.low = Value()
-
-    def set_from_number(self, v):
-        assert isinstance(v, int) or isinstance(v, long), v
-        low = v & BIT_MASK_17
-        padding_bit = (v >> 17) & 1
-        high = v >> 18
-        self.high = WideValue.new_from_number(high)
-        self.low = Value.new_from_number(low)
-        self.padding_bit = padding_bit
-
-    def as_number(self):
-        return (
-            (self.high.as_number() << 18) +
-            (self.padding_bit << 17) +
-            self.low.as_number())
-
-    def __repr__(self):
-        return "{} {} {}".format(
-            self.high,
-            self.padding_bit,
-            self.low.as_bits_string())
 
 
 def _calc_num_shift(instr):
@@ -352,7 +287,8 @@ if __name__ == '__main__':
     if 'test' in sys.argv:
         print "Running tests..."
         from tests import _test
-        _test()
+        edsac = Edsac()
+        _test(edsac)
     elif globals().get("DEBUG"):
         # make easy debug on ipython
         print "Running tests..."

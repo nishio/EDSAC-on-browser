@@ -151,7 +151,7 @@ class Edsac(object):
             self.next_char += 1
             v = _ascii_to_edsac(c)
             print "read", c
-            self.set_memory(addr, Value.from_number(v))
+            self.set_memory(addr, Value.new_from_number(v))
 
         elif op == "A":
             # AnS: A += m[n]
@@ -175,7 +175,7 @@ class Edsac(object):
             else:
                 a = self.get_accumulator(wide=True)
             v += a.as_number()
-            a.from_number(v)
+            a.set_from_number(v)
         elif op == "N":
             m = self.get_memory(addr, wide)
             r = self.get_multiplier(wide)
@@ -185,25 +185,21 @@ class Edsac(object):
             else:
                 a = self.get_accumulator(wide=True)
             v -= a.as_number()
-            a.from_number(v)
+            a.set_from_number(v)
 
         elif op == "R":
             # Shift right
             num_shift = _calc_num_shift(instr)
             v = self.accumulator.as_number()
-            print self.accumulator
-            print v
             v = v >> num_shift
-            print self.accumulator
-            print v
-            self.accumulator.from_number(v)
-            print self.accumulator
+            self.accumulator.set_from_number(v)
+
         elif op == "L":
             # Shift left
             num_shift = _calc_num_shift(instr)
             v = self.accumulator.as_number()
             v = v << num_shift
-            self.accumulator.from_number(v)
+            self.accumulator.set_from_number(v)
 
         elif op == "U":
             # UnS: m[n]=A
@@ -252,19 +248,25 @@ class WideValue(object):
             self.low.as_number())
 
     @staticmethod
-    def from_number(v):
+    def new_from_number(v):
+        assert isinstance(v, int) or isinstance(v, long), v
+        ret = WideValue()
+        ret.set_from_number(v)
+        return ret
+
+    def set_from_number(self, v):
         assert isinstance(v, int) or isinstance(v, long), v
         low = v & BIT_MASK_17
         padding_bit = (v >> 17) & 1
         high = v >> 18
-        return WideValue(
-            Value.from_number(high),
-            Value.from_number(low),
-            padding_bit)
+        self.high.set_from_number(high)
+        self.low.set_from_number(low)
+        self.padding_bit = padding_bit
+        return self
 
     def __add__(self, v):
         assert isinstance(v, WideValue)
-        return WideValue.from_number(
+        return WideValue.new_from_number(
             self.as_number() + v.as_number())
 
     def __repr__(self):
@@ -287,14 +289,13 @@ class ThreeValue(object):
         self.padding_bit = padding_bit
         self.low = Value()
 
-    def from_number(self, v):
+    def set_from_number(self, v):
         assert isinstance(v, int) or isinstance(v, long), v
         low = v & BIT_MASK_17
         padding_bit = (v >> 17) & 1
         high = v >> 18
-        print high, padding_bit, low
-        self.high = WideValue.from_number(high)
-        self.low = Value.from_number(low)
+        self.high = WideValue.new_from_number(high)
+        self.low = Value.new_from_number(low)
         self.padding_bit = padding_bit
 
     def as_number(self):

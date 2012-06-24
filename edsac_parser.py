@@ -75,15 +75,26 @@ class Value(object):
             self.bits = [0] * HALF_WORD_LENGTH
 
     @staticmethod
-    def from_number(v):
+    def new_from_number(v):
         """
-        >>> x = Value.from_number(1234)
+        >>> x = Value.new_from_number(1234)
         >>> x.bits
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
         >>> x.as_number()
         1234
         """
         return Value(_number2bits(v))
+
+    def set_from_number(self, v):
+        """
+        >>> x = Value.new_from_number(1234)
+        >>> x.bits
+        [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
+        >>> x.as_number()
+        1234
+        """
+        self.bits = _number2bits(v)
+        return self
 
     def as_number(self):
         """
@@ -203,12 +214,12 @@ class Value(object):
 
     def __add__(self, v):
         assert isinstance(v, Value)
-        return Value.from_number(
+        return Value.new_from_number(
             self.as_number() + v.as_number())
 
     def __sub__(self, v):
         assert isinstance(v, Value)
-        return Value.from_number(
+        return Value.new_from_number(
             self.as_number() - v.as_number())
 
 ORDER_PATTERN = '([A-Z#!&@])(\d*)([SL])'

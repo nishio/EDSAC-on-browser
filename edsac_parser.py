@@ -13,6 +13,17 @@ ORDER_FORMAT = {
     'SL': 16
 }
 
+"""
+Edsac character codes
+some control codes are mapped as follows
+figs: #, lets: *, null: ., cr: @, sp: !, lf: &
+"""
+
+LETTERS = 'PQWERTYUIOJ#SZK*.F@D!HNM&LXGABCV'
+FIGURES = '0123456789?#"+(*.$@;!\xa3,.&)/#-?:='
+
+assert len(LETTERS) == 32
+assert len(FIGURES) == 32
 
 def _number2bits(number, width=HALF_WORD_LENGTH):
     result = []
@@ -30,19 +41,6 @@ def _bits2number(bits):
         result *= 2
         result += v
     return result
-
-"""
-Edsac character codes
-some control codes are mapped as follows
-figs: #, lets: *, null: ., cr: @, sp: !, lf: &
-"""
-
-LETTERS = 'PQWERTYUIOJ#SZK*.F@D!HNM&LXGABCV'
-FIGURES = '0123456789?#"+(*.$@;!\xa3,.&)/#-?:='
-
-
-assert len(LETTERS) == 32
-assert len(FIGURES) == 32
 
 
 def _ascii_to_edsac(c):
@@ -93,18 +91,43 @@ class Value(object):
         >>> x.as_number()
         1234
         """
-        self.bits = _number2bits(v)
+        sign_bit = 0
+        if v < 0 or v > (1 << 16):
+            sign_bit = 1
+
+        self.bits = [sign_bit] + _number2bits(v, 16)
         return self
 
     def as_number(self):
         """
-        >>> x = Value.from_number(1234)
+        >>> x = Value.new_from_number(1234)
         >>> x.bits
         [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0]
         >>> x.as_number()
         1234
+        >>> Value.from_bits_string("00000000000100001").as_number()
+        33
+        >>> Value.from_bits_string("11111111111101111").as_number()
+        -17
         """
-        return _bits2number(self.bits)
+        v = _bits2number(self.bits[1:])
+        if self.bits[0] == 1:
+            v -= (1 << 16)
+        return v
+
+    def as_real(self):
+        """
+        >>> Value.from_bits_string("00011000000000000").as_real()
+        0.1875
+        >>> Value.from_bits_string("11000000000000000").as_real()
+        -0.5
+        """
+        sign = 1
+        if self.bits[0] == 1:
+            sign = -1
+
+        value = _bits2number(self.bits[1:])
+        return sign * value / float(1 << 16)
 
     @staticmethod
     def from_order(order):

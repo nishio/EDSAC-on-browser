@@ -3,13 +3,37 @@
 EDSAC emulator
 """
 import sys
-from edsac_parser import Value, _ascii_to_edsac, _number2bits
+from edsac_parser import Value, _ascii_to_edsac, _number2bits, _bits2number
 
 
 BIT_MASK_17 = (1 << 17) - 1
 MIN_MEMORY_ADDR = 0
 MAX_MEMORY_ADDR = 1024
 
+#
+# Values
+
+def _real_to_int(v, bitwidth):
+    """
+    >>> _real_to_int(-0.5)
+    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    >>> _real_to_int(0.1875)
+    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    """
+    sign = 0
+    if v < 0:
+        sign = 1
+        v *= -1
+    buf = [sign]
+    for i in range(bitwidth - 1):
+        v *= 2
+        if v >= 1:
+            buf.append(1)
+            v -= 1
+        else:
+            buf.append(0)
+    print buf
+    return _bits2number(buf)
 
 class Edsac(object):
     def __init__(self):
@@ -120,8 +144,7 @@ class Edsac(object):
         print self.sequence_control, instr.as_order()
         op, addr, sl = instr.as_order()
         wide = (sl == "L")
-        if self.sequence_control == 13:
-            print self.get_accumulator()
+
         if op == "T":
             # TnS: m[n]=A; ABC=0
             # TnL: w[n]=AB; ABC=0
@@ -168,14 +191,25 @@ class Edsac(object):
 
         elif op == "V":
             m = self.get_memory(addr, wide)
+            print "m", m
             r = self.get_multiplier(wide)
-            v = m.as_number() * r.as_number()
+            print "r", r
+            v = m.as_real() * r.as_real()
             if wide:
                 a = self.accumulator
             else:
                 a = self.get_accumulator(wide=True)
+            print "v", v
+            v = _real_to_int(v, 35) # bad idea
+            print "v", v
+            print "a", a.as_number()
             v += a.as_number()
+            print "v", v
+            import pdb
+            pdb.set_trace()
             a.set_from_number(v)
+            print "a", a
+
         elif op == "N":
             m = self.get_memory(addr, wide)
             r = self.get_multiplier(wide)
@@ -352,7 +386,8 @@ if __name__ == '__main__':
     if 'test' in sys.argv:
         print "Running tests..."
         from tests import _test
-        _test()
+        edsac = Edsac()
+        _test(edsac)
     elif globals().get("DEBUG"):
         # make easy debug on ipython
         print "Running tests..."

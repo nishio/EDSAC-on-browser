@@ -28,10 +28,11 @@ class Edsac(object):
 
     def set_multiplier(self, value, wide=False):
         if wide:
-            assert isinstance(value, WordValue)
+            assert isinstance(value, Value) and value.bitwidth == 35
             self.multiplier = value
-        assert isinstance(value, Value)
-        self.multiplier.high = value
+        else:
+            assert isinstance(value, Value) and value.bitwidth == 17
+            self.multiplier.high = value
 
     def set_memory(self, address, value, wide=False):
         assert 0 <= address < 1024

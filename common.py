@@ -17,3 +17,11 @@ ORDER_FORMAT = {
 
 ORDER_PATTERN = '([A-Z#!&@])(\d*)([SL])'
 
+class Assert(object):
+    def __init__(self, value):
+        self.value = value
+
+    def equal(self, v):
+        if isinstance(v, str) and not isinstance(self.value, str):
+            self.value = repr(self.value)
+        assert self.value == v, "expect %r but %r" % (v, self.value)

@@ -256,7 +256,7 @@ class Value(object):
     def is_negative(self):
         return (self.bits[0] == 1)
 
-class WordValue(Value):  # TODO: rename to WordValue
+class WordValue(Value):
     "35bit words"
     bitwidth = 31
     def __init__(self, high=None, low=None, padding_bit=0):
@@ -303,7 +303,7 @@ class WordValue(Value):  # TODO: rename to WordValue
             self.low.as_bits_string())
 
 
-class DoubleWordValue(Value):  #TODO rename to DoubleWordValue
+class DoubleWordValue(Value):
     """
     71-bit register (for accumlator)
     """

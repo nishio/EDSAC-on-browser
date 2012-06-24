@@ -158,7 +158,7 @@ class Edsac(object):
             # AnL: AB += w[n]
             m = self.get_memory(addr, wide)
             r = self.get_accumulator(wide)
-            r = m + r
+            r = r + m
             self.set_accumulator(r, wide)
         elif op == "S":
             m = self.get_memory(addr, wide)

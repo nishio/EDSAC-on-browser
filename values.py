@@ -294,7 +294,7 @@ class WordValue(Value):
         return (
             (self.high.as_integer() << (self.halfwidth + 1)) +
             (self.padding_bit << self.halfwidth) +
-            self.low.as_integer())
+            self.low.as_unsigned())
 
     def as_unsigned(self):
         return (

@@ -67,6 +67,17 @@ def _test_initial_order(edsac):
     # total number is now 12
     Assert(edsac.get_memory(1).as_integer()).equal(12)
 
+    while edsac.sequence_control != 31:
+        edsac.step()
+
+    # check all memory is correctly assembled
+    fi = file("square.txt")
+    for addr in range(31, 123):
+        line = fi.readline()
+        expected = line[:20]
+        Assert(edsac.get_memory(addr)).equal(expected)
+    print "ok"
+
 def _test(edsac):
     import doctest
     doctest.testmod()

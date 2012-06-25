@@ -24,19 +24,14 @@ use memories in human-readable way.
 TODO
 ====
 
-- most high bit of tape is complemented. write test.
-- complete "_test_initial_order()" (now on line 13)
+- Try other sample to run
+- Multiplication of 35bit words won't work because not enough accuracy
 
-- Values are treated as 5 types: list of 0/1, string of 0/1/space, unsigned integer, signed interger and real.
-  Current design are too ad hoc.
-- classess Value, WideValue and ThreeValue are ugly, it is because I didn't notice ABC is 1.5 words width.
-- repr should return eval-able string
 
+License
 =======
 
-MIT License
-
-by NISHIO Hirokazu (c)2012
+GPLv3 by NISHIO Hirokazu (c)2012
 
 
 Reference
@@ -53,6 +48,7 @@ Reference
 - http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
 - http://www.cs.clemson.edu/~mark/edsac.html
 - http://www.dcs.warwick.ac.uk/~edsac/Software/EdsacTG.pdf
+
 
 Thanks
 ======

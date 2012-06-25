@@ -13,6 +13,7 @@ from common import *
 import re
 from io import ascii_to_edsac, edsac_to_letter
 
+
 def bits_to_unsigned(bits):
     """
     >>> bits_to_unsigned([1, 1, 1])
@@ -25,8 +26,6 @@ def bits_to_unsigned(bits):
     return result
 
 
-#
-# Values
 def _number2bits(number, width=HALF_WORD_LENGTH):
     result = []
     # round into 0 .. (1 << width) - 1
@@ -35,7 +34,6 @@ def _number2bits(number, width=HALF_WORD_LENGTH):
         result.insert(0, number & 1)
         number /= 2
     return result
-
 
 
 def real_to_bits(v, bitwidth=17):
@@ -59,6 +57,7 @@ def real_to_bits(v, bitwidth=17):
             buf.append(0)
     return buf
 
+
 def real_to_unsigned(v, bitwidth=17):
     return bits_to_unsigned(real_to_bits(v, bitwidth))
 
@@ -66,11 +65,14 @@ def real_to_unsigned(v, bitwidth=17):
 def _max_int(bitwidth):
     return (1 << (bitwidth - 1)) - 1
 
+
 def _int_ubound(bitwidth):
     return 1 << (bitwidth - 1)
 
+
 def _bit_mask(bitwidth):
     return (1 << bitwidth) - 1
+
 
 class Value(object):
     """
@@ -254,17 +256,18 @@ class Value(object):
         )
 
     def __add__(self, v):
-        Assert(self.bitwidth).equal(v.bitwidth);
+        Assert(self.bitwidth).equal(v.bitwidth)
         return Value.new_from_number(
             self.as_integer() + v.as_integer())
 
     def __sub__(self, v):
-        Assert(self.bitwidth).equal(v.bitwidth);
+        Assert(self.bitwidth).equal(v.bitwidth)
         return Value.new_from_number(
             self.as_integer() - v.as_integer())
 
     def is_negative(self):
         return (self.bits[0] == 1)
+
 
 def _empty_storage(bitwidth):
     if bitwidth == 17:
@@ -274,10 +277,12 @@ def _empty_storage(bitwidth):
     else:
         raise AssertionError("17bit or 35bit required")
 
+
 class WordValue(Value):
     "35bit words"
     bitwidth = 35
-    halfwidth = 17 # (35 - 1) / 2
+    halfwidth = 17  # (35 - 1) / 2
+
     def __init__(self, high=None, low=None, padding_bit=0):
         if not high:
             high = _empty_storage(self.halfwidth)
@@ -300,7 +305,7 @@ class WordValue(Value):
             (self.high.as_unsigned() << (self.halfwidth + 1)) +
             (self.padding_bit << self.halfwidth) +
             self.low.as_unsigned())
-    
+
     @staticmethod
     def new_from_number(v):
         assert isinstance(v, int) or isinstance(v, long), v
@@ -330,7 +335,7 @@ class DoubleWordValue(WordValue):
     71-bit register (for accumlator)
     """
     bitwidth = 71
-    halfwidth = 35 # (71 - 1) / 2
+    halfwidth = 35  # (71 - 1) / 2
 
     # inherit as_integer
     # inherit set_from_number

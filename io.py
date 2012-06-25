@@ -16,9 +16,11 @@ MAX_CHAR_CODE = 32
 assert len(LETTERS) == MAX_CHAR_CODE
 assert len(FIGURES) == MAX_CHAR_CODE
 
+
 class Output(object):
     def __init__(self):
         self.is_letter = True
+
     def __call__(self, c):
         assert isinstance(c, int) and 0 <= c < MAX_CHAR_CODE
         if self.is_letter:
@@ -42,6 +44,7 @@ class Output(object):
         else:
             return ret
 
+
 def ascii_to_edsac(c):
     """
     take a ascii character and return edsac code
@@ -55,9 +58,11 @@ def ascii_to_edsac(c):
         raise RuntimeError("unknown character %r" % c)
     return r
 
+
 def edsac_to_letter(c):
     assert isinstance(c, int) and 0 <= c < MAX_CHAR_CODE
     return LETTERS[c]
+
 
 def edsac_to_figure(c):
     assert isinstance(c, int) and 0 <= c < MAX_CHAR_CODE

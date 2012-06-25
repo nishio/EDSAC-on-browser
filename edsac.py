@@ -4,11 +4,12 @@ EDSAC emulator
 """
 import sys
 from common import *
-from values import Value, WordValue, DoubleWordValue, real_to_unsigned #, _ascii_to_edsac, _number2bits, bits_to_unsigned
+from values import Value, WordValue, DoubleWordValue, real_to_unsigned
 import io
 import argparse
 SHOW_RUNNNING_INSTRUCTION = True
 REAL_OUTPUT = False
+
 
 class Edsac(object):
     def __init__(self):
@@ -176,10 +177,10 @@ class Edsac(object):
             v = m.as_real() * r.as_real()
             if wide:
                 a = self.accumulator
-                v = real_to_unsigned(v, 71) # bad idea
+                v = real_to_unsigned(v, 71)  # bad idea
             else:
                 a = self.get_accumulator(wide=True)
-                v = real_to_unsigned(v, 35) # bad idea
+                v = real_to_unsigned(v, 35)  # bad idea
             v += a.as_integer()
             a.set_from_number(v)
 
@@ -242,8 +243,6 @@ class Edsac(object):
 
         self.sequence_control += 1
         return False  # not finished
-
-
 
 
 def _calc_num_shift(instr):

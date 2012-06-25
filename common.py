@@ -16,6 +16,7 @@ ORDER_FORMAT = {
 
 ORDER_PATTERN = '([A-Z#!&@])(\d*)([SL])'
 
+
 class Assert(object):
     def __init__(self, value):
         self.value = value

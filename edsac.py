@@ -8,7 +8,7 @@ from values import Value, WordValue, DoubleWordValue, real_to_unsigned
 import io
 import argparse
 SHOW_RUNNNING_INSTRUCTION = True
-REAL_OUTPUT = False
+DEBUG_IO = False
 
 
 class Edsac(object):
@@ -157,6 +157,8 @@ class Edsac(object):
             self.next_char += 1
             v = io.ascii_to_edsac(c)
             self.set_memory(addr, Value.new_from_number(v))
+            if DEBUG_IO:
+                print "read", c, v
 
         elif op == "A":
             # AnS: A += m[n]
@@ -221,14 +223,14 @@ class Edsac(object):
 
         elif op == "O":
             # output
-            if REAL_OUTPUT:
-                sys.stdout.write(
-                    self.output(
-                    self.get_memory(addr).as_charcode()))
-            else:
+            if DEBUG_IO:
                 code = self.get_memory(addr).as_charcode()
                 print "output %s %s %s" % (
                     io.edsac_to_letter(code), io.edsac_to_figure(code), code)
+            else:
+                sys.stdout.write(
+                    self.output(
+                    self.get_memory(addr).as_charcode()))
 
         elif op == "X":
             pass  # no operation
@@ -291,16 +293,14 @@ if __name__ == '__main__':
                         dest='show_runnning_instruction',
                         action='store_true',
                         help='show runnning instruction')
-    parser.add_argument('--real-output',
-                        dest='real_output',
+    parser.add_argument('--debug-io',
+                        dest='debug_io',
                         action='store_true',
-                        help='use real output instead of verbose debug print')
+                        help='use a line for one IO')
 
     args = parser.parse_args()
     SHOW_RUNNNING_INSTRUCTION = args.show_runnning_instruction
-    if args.real_output:
-        REAL_OUTPUT = True
-        SHOW_RUNNNING_INSTRUCTION = False
+    DEBUG_IO = args.debug_io
 
     if args.test:
         print "Running tests..."

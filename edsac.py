@@ -91,9 +91,9 @@ class Edsac(object):
             v = Value.from_bits_string(bits_str)
             self.set_memory(i, v)
 
-    def set_cards_from_file(self):
+    def set_cards_from_file(self, filename="square_card.txt"):
         self.cards = []
-        for line in open("square_card.txt"):
+        for line in open(filename):
             if line == "\n":
                 continue  # skip empty line
             self.cards.append(line[0])
@@ -280,7 +280,7 @@ def main():
     global edsac
     edsac = Edsac()
     edsac.load_initial_order()
-    edsac.set_cards_from_file()
+    edsac.set_cards_from_file(args.tape)
     edsac.start()
 
 
@@ -297,6 +297,11 @@ if __name__ == '__main__':
                         dest='debug_io',
                         action='store_true',
                         help='use a line for one IO')
+    parser.add_argument('--tape',
+                        dest='tape',
+                        action='store',
+                        default='square_card.txt',
+                        help='filename of tape to run (default=square_card.txt)')
 
     args = parser.parse_args()
     SHOW_RUNNNING_INSTRUCTION = args.show_runnning_instruction

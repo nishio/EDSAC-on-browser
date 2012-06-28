@@ -176,26 +176,23 @@ class Edsac(object):
         elif op == "V":
             m = self.get_memory(addr, wide)
             r = self.get_multiplier(wide)
-            v = m.as_real() * r.as_real()
+            v = m.multiply(r)
             if wide:
                 a = self.accumulator
-                v = real_to_unsigned(v, 71)  # bad idea
             else:
                 a = self.get_accumulator(wide=True)
-                v = real_to_unsigned(v, 35)  # bad idea
-            v += a.as_integer()
-            a.set_from_number(v)
+            a.set(a + v)
 
         elif op == "N":
             m = self.get_memory(addr, wide)
             r = self.get_multiplier(wide)
             v = m.as_integer() * r.as_integer()
+            v = m.multiply(r)
             if wide:
                 a = self.accumulator
             else:
                 a = self.get_accumulator(wide=True)
-            v -= a.as_integer()
-            a.set_from_number(v)
+            a.set(a - v)
 
         elif op == "R":
             # Shift right

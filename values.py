@@ -3,11 +3,12 @@
 Edsac value representation
 
 Edsac has 17bit, 35bit and 71bit memory storage.
-We use 5 types of representation: list of 0 or 1 (called 'bits'),
+We use 5 types of representation:
+   list of 0 or 1 (called 'bits'),
    string of '0' '1' or ' ' (called 'bit_string'),
    unsigned integer, signed integer and real.
 Conversation between those are 20 pattern. It's not good design.
-We use a mediator class 'Value' instead of storing directly.
+We use a mediator class 'Value' instead of converting values directly.
 """
 from common import *
 import re
@@ -257,16 +258,26 @@ class Value(object):
 
     def __add__(self, v):
         Assert(self.bitwidth).equal(v.bitwidth)
-        return Value.new_from_number(
+        return self.__class__.new_from_number(
             self.as_integer() + v.as_integer())
 
     def __sub__(self, v):
         Assert(self.bitwidth).equal(v.bitwidth)
-        return Value.new_from_number(
+        return self.__class__.new_from_number(
             self.as_integer() - v.as_integer())
 
     def is_negative(self):
         return (self.bits[0] == 1)
+
+    def multiply(self, v):
+        Assert(self.bitwidth).equal(v.bitwidth)
+        # (<< 2) is for one padding bit and one sign bit
+        ret = (self.as_integer() * v.as_integer()) << 2
+        return WordValue.new_from_number(ret)
+
+    def set(self, v):
+        Assert(self.bitwidth).equal(v.bitwidth)
+        self.bits = v.bits
 
 
 def _empty_storage(bitwidth):
@@ -328,6 +339,18 @@ class WordValue(Value):
             self.high.as_bits_string(),
             self.padding_bit,
             self.low.as_bits_string())
+
+    def multiply(self, v):
+        Assert(self.bitwidth).equal(v.bitwidth)
+        # (<< 2) is for one padding bit and one sign bit
+        ret = (self.as_integer() * v.as_integer()) << 2
+        return DoubleWordValue.new_from_number(ret)
+
+    def set(self, v):
+        Assert(self.bitwidth).equal(v.bitwidth)
+        self.high = v.high
+        self.low = v.low
+        self.padding_bit = v.padding_bit
 
 
 class DoubleWordValue(WordValue):

@@ -25,7 +25,6 @@ TODO
 ====
 
 - Try other sample to run
-- Multiplication of 35bit words won't work because not enough accuracy
 
 
 License

@@ -21,10 +21,23 @@ For easy learning and inspectation,
 use memories in human-readable way.
 
 
+Usage
+=====
+
+Now we have a Python version. No JS version yet.
+
+$ python edsac.py
+
+will show square numbers and its difference. See edsacposter.pdf
+
+
 TODO
 ====
 
-- Try other sample to run
+- Try other sample to run (next target is WadaSieve)
+- Need visualization of memory pattern. (use canvas?)
+- I made 3 classes Value, WordValue, DoubleWordValue,
+  however I feel it is better to use only one class 'Bits'
 
 
 License

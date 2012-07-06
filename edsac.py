@@ -91,12 +91,26 @@ class Edsac(object):
             v = Value.from_bits_string(bits_str)
             self.set_memory(i, v)
 
-    def set_cards_from_file(self, filename="square_card.txt"):
+    def set_cards_from_file(self, filename="square.txt"):
         self.cards = []
-        for line in open(filename):
-            if line == "\n":
-                continue  # skip empty line
-            self.cards.append(line[0])
+        in_comment = False
+        end_of_comment = None
+        acceptable = set(io.LETTERS + io.FIGURES)
+        for c in open(filename).read():
+            if in_comment:
+                if c == end_of_comment:
+                    in_comment = False
+                continue
+
+            if c == "[": # comment [...]
+                end_of_comment = "]"
+                in_comment = True
+            if c == ";": # comment ;...(EOL)
+                end_of_comment = "\n"
+                in_comment = True
+
+            if c in acceptable:
+                self.cards.append(c)
 
         assert self.cards[0] == "T"
         self.next_char = 0
@@ -297,8 +311,8 @@ if __name__ == '__main__':
     parser.add_argument('--tape',
                         dest='tape',
                         action='store',
-                        default='square_card.txt',
-                        help='filename of tape to run (default=square_card.txt)')
+                        default='square.txt',
+                        help='filename of tape to run (default=square.txt)')
 
     args = parser.parse_args()
     SHOW_RUNNNING_INSTRUCTION = args.show_runnning_instruction

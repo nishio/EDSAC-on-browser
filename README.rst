@@ -35,10 +35,20 @@ TODO
 ====
 
 - Try other sample to run (next target is WadaSieve)
-- Need visualization of memory pattern. (use canvas?)
+
+  - comment: [...] and ;..(EOL)
+  - ignore space and newline
+  - Need visualization of memory pattern. (use canvas?)
+
+    - easy method: print on console
+
 - I made 3 classes Value, WordValue, DoubleWordValue,
   however I feel it is better to use only one class 'Bits'
 
+- JS version
+
+  - select sample code from a listbox: like http://jsx.github.com/try-on-web/
+  - step execution
 
 License
 =======
@@ -59,8 +69,11 @@ Reference
 
 - http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
 - http://www.cs.clemson.edu/~mark/edsac.html
-- http://www.dcs.warwick.ac.uk/~edsac/Software/EdsacTG.pdf
+- http://www.dcs.warwick.ac.uk/~edsac/
 
+  - You can download simulator
+  - `Tutorial <http://www.dcs.warwick.ac.uk/~edsac/Software/EdsacTG.pdf>`_ helps our understanding.
+  - EdsacDoc.pdf in EdsacLx describe about subroutine specification. If you want to know what is M3 or P6, read it.
 
 Thanks
 ======

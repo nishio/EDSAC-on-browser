@@ -369,8 +369,11 @@ def _test_parser():
             .as_pretty_bits_string() == bits_str)
 
     for line in file("square.txt"):
-        bits_str = line[:MAX_BITS_LINE_LENGTH]
-        order_str = line[INITIAL_ORDER_LINE_STARTS:].split()[1]
+        m = re.match(r"\[(.*)\] \[.*\] (.*)", line)
+        if not m: continue
+        g = m.groups()
+        bits_str = g[0]
+        order_str = g[1]
         assert (
             Value.from_order_string(order_str)
             .as_pretty_bits_string() == bits_str), line

@@ -12,12 +12,11 @@ We use a mediator class 'Value' instead of converting values directly.
 """
 from common import *
 import re
-from io import ascii_to_edsac, edsac_to_letter
+import io
 
-
-def bits_to_unsigned(bits):
+def _bits_to_unsigned(bits):
     """
-    >>> bits_to_unsigned([1, 1, 1])
+    >>> _bits_to_unsigned([1, 1, 1])
     7
     """
     result = 0
@@ -27,7 +26,7 @@ def bits_to_unsigned(bits):
     return result
 
 
-def _number2bits(number, width=HALF_WORD_LENGTH):
+def integer_to_bits(number, width=HALF_WORD_LENGTH):
     result = []
     # round into 0 .. (1 << width) - 1
     number %= (1 << width)
@@ -37,41 +36,29 @@ def _number2bits(number, width=HALF_WORD_LENGTH):
     return result
 
 
-def real_to_bits(v, bitwidth=17):
-    """
-    >>> real_to_bits(-0.5)
-    [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    >>> real_to_bits(0.1875)
-    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    """
-    sign = 0
-    if v < 0:
-        sign = 1
-        v *= -1
-    buf = [sign]
-    for i in range(bitwidth - 1):
-        v *= 2
-        if v >= 1:
-            buf.append(1)
-            v -= 1
-        else:
-            buf.append(0)
-    return buf
-
-
-def real_to_unsigned(v, bitwidth=17):
-    return bits_to_unsigned(real_to_bits(v, bitwidth))
-
-
 def _max_int(bitwidth):
+    """
+    max signed integer
+    >>> _max_int(10)
+    511
+    """
     return (1 << (bitwidth - 1)) - 1
 
 
 def _int_ubound(bitwidth):
+    """
+    upper bound of signed int
+    >>> _int_ubound(10)
+    512
+    """
     return 1 << (bitwidth - 1)
 
 
 def _bit_mask(bitwidth):
+    """
+    >>> bin(_bit_mask(5))
+    '0b11111'
+    """
     return (1 << bitwidth) - 1
 
 
@@ -101,7 +88,7 @@ class Value(object):
         >>> x.as_integer()
         1234
         """
-        return Value(_number2bits(v))
+        return Value(integer_to_bits(v))
 
     def set_from_number(self, v):
         """
@@ -115,7 +102,7 @@ class Value(object):
         if v < 0 or v > _max_int(self.bitwidth):
             sign_bit = 1
 
-        self.bits = [sign_bit] + _number2bits(v, self.bitwidth - 1)
+        self.bits = [sign_bit] + integer_to_bits(v, self.bitwidth - 1)
         return self
 
     def as_integer(self):
@@ -130,7 +117,7 @@ class Value(object):
         >>> Value.from_bits_string("11111111111101111").as_integer()
         -17
         """
-        v = bits_to_unsigned(self.bits[1:])
+        v = _bits_to_unsigned(self.bits[1:])
         if self.bits[0] == 1:
             v -= _int_ubound(self.bitwidth)
         return v
@@ -140,7 +127,7 @@ class Value(object):
         >>> Value.from_bits_string("11111111111101111").as_unsigned()
         131055
         """
-        return bits_to_unsigned(self.bits)
+        return _bits_to_unsigned(self.bits)
 
     def as_real(self):
         """
@@ -171,11 +158,11 @@ class Value(object):
             sl = [1]
         if addr < 2 ** 10:
             # 5 bits op
-            op_bit = _number2bits(ascii_to_edsac(op), 5)
+            op_bit = integer_to_bits(io.ascii_to_edsac(op), 5)
             # 1 bit unused
             unused_bit = [0]
             # 10 bits address
-            addr_bit = _number2bits(addr, 10)
+            addr_bit = integer_to_bits(addr, 10)
             # 1 bit S/L
             result = op_bit + unused_bit + addr_bit + sl
         else:
@@ -184,7 +171,7 @@ class Value(object):
                 raise NotImplementedError(
                     "I don't know how to put %s in bits" % order)
             # 16 bits
-            result = _number2bits(addr, 16) + sl
+            result = integer_to_bits(addr, 16) + sl
         return Value(result)
 
     def as_order(self):
@@ -197,8 +184,8 @@ class Value(object):
         ('T', 11, 'L')
         """
         assert len(self.bits) == HALF_WORD_LENGTH
-        op = edsac_to_letter(bits_to_unsigned(self.bits[:5]))
-        addr = bits_to_unsigned(
+        op = io.edsac_to_letter(_bits_to_unsigned(self.bits[:5]))
+        addr = _bits_to_unsigned(
             self.bits[
                 ORDER_FORMAT['ADDRESS_START']: ORDER_FORMAT['ADDRESS_END']
             ]
@@ -252,7 +239,7 @@ class Value(object):
         return Value.from_order((op, addr, sl))
 
     def as_charcode(self):
-        return bits_to_unsigned(
+        return _bits_to_unsigned(
             self.bits[ORDER_FORMAT['OP_START']: ORDER_FORMAT['OP_END']]
         )
 

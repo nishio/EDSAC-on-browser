@@ -4,7 +4,7 @@ EDSAC emulator
 """
 import sys
 from common import *
-from values import Value, WordValue, DoubleWordValue, real_to_unsigned
+from values import Value, WordValue, DoubleWordValue
 import io
 import argparse
 SHOW_RUNNNING_INSTRUCTION = True

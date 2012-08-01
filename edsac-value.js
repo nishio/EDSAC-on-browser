@@ -113,11 +113,9 @@ edsac.Value.prototype.printDecimal = function() {
 
     var s = '';
 
-    console.log(v.printBinary());
     while (!v.isZero()) {
         // divide the number by 10...
         var qr = edsac.valueDivRem(v, edsac.decimalTable[10]);
-        console.log(qr[0].printBinary()+'|'+qr[1].printBinary());
         // the remainder is the digit we need to print
         var r = qr[1];
         // convert from bits to a number

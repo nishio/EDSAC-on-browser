@@ -74,5 +74,12 @@ edsac.test = function() {
     edsac.assertDecimal(B('0101010'), '42');
     edsac.assertDecimal(B('0100101'), '37');
 
+    v = B('000');
+    v.negate();
+    edsac.assertBinary(v, '000');
+    v = B('0101010');
+    v.negate();
+    edsac.assertBinary(v, '1010110');
+
     console.log('All tests OK!');
 };

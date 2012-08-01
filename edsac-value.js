@@ -175,6 +175,13 @@ edsac.Value.prototype.shiftRight = function(m) {
         this.set(i, this.get(i+m));
 };
 
+// this = -this
+// (equivalent to this = ~this + 1)
+edsac.Value.prototype.negate = function() {
+    for (var i = 0; i < this.n; i++)
+        this.set(i, 1-this.get(i));
+    this.add(new edsac.Value([1,0]));
+};
 
 // this += v
 edsac.Value.prototype.add = function(v) {

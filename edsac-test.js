@@ -57,5 +57,14 @@ edsac.test = function() {
     edsac.assertBinary(D('2',3), '010');
     edsac.assertBinary(D('42',7), '0101010');
 
+    edsac.assertEqual(B('01').compare(B('0')), 1); // 1 > 0
+    edsac.assertEqual(B('01').compare(B('011')), -1); // 1 < 3
+    edsac.assertEqual(B('11').compare(B('10')), -1); // -1 < -2
+    edsac.assertEqual(B('01').compare(B('01')), 0); // 1 == 1
+
+    var qr = edsac.valueDivRem(B('0101010'), B('0101')); // 42 div 5 = 8, rem 2
+    edsac.assertBinary(qr[0], '0001000');
+    edsac.assertBinary(qr[1], '00010');
+
     console.log('All tests OK!');
 };

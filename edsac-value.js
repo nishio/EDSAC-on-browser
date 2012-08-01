@@ -31,12 +31,48 @@ edsac.zeroValue = function(n) {
 edsac.Value.prototype.get = function(i) {
     // Outside of the array, we replicate the oldest (sign) bit
     if (i >= this.n)
-        return this.bits[this.start+this.n-1];
+        return this.signBit();
     return this.bits[this.start+i];
 };
 
 edsac.Value.prototype.set = function(i, b) {
     this.bits[this.start+i] = b;
+};
+
+edsac.Value.prototype.signBit = function() {
+    return this.bits[this.start+this.n-1];
+};
+
+edsac.Value.prototype.isZero = function() {
+    for (var i = 0; i < this.n; i++)
+        if (this.get(i))
+            return false;
+    return true;
+};
+
+// returns -1, 0, 1 (this < v, this == v, this > v)
+edsac.Value.prototype.compare = function(v) {
+    // First, check sign bits
+    var s1 = this.signBit();
+    var s2 = v.signBit();
+
+    if (s1 == 1 && s2 == 0)
+        return -1;
+    if (s1 == 0 && s2 == 1)
+        return 1;
+
+    // Now compare the remaining bits. The result
+    // will depend on the sign bit
+    for (var i = this.n-1; i >= 0; i--) {
+        var b1 = this.get(i);
+        var b2 = v.get(i);
+
+        if (b1 == 1 && b2 == 0)
+            return s1 ? -1 : 1;
+        if (b1 == 0 && b2 == 1)
+            return s1 ? 1 : -1;
+    }
+    return 0;
 };
 
 // Printing and reading binary
@@ -155,4 +191,25 @@ edsac.valueMult = function(v, w) {
 // this *= v
 edsac.Value.prototype.mult = function(v) {
     this.assign(edsac.valueMult(this, v));
+};
+
+// [v // w, v % w]
+// The algorithm is taken from
+//   http://en.wikipedia.org/wiki/Division_%28digital%29
+// TODO handle sign
+edsac.valueDivRem = function(v, w) {
+    if (w.isZero())
+        throw 'division by zero';
+    var q = edsac.zeroValue(v.n); // quotient
+    var r = edsac.zeroValue(w.n+1); // remainder
+    for (var i = v.n-1; i >= 0; i--) {
+        r.shiftLeft(1);
+        r.set(0, v.get(i));
+
+        if (r.compare(w) >= 0) {
+            r.sub(w);
+            q.set(i, 1);
+        }
+    }
+    return [q, r];
 };

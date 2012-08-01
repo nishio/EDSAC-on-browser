@@ -257,10 +257,20 @@ edsac.Value.prototype.mult = function(v) {
 // [v // w, v % w]
 // The algorithm is taken from
 //   http://en.wikipedia.org/wiki/Division_%28digital%29
-// TODO handle sign
 edsac.valueDivRem = function(v, w) {
+    var signBit = 0;
+    if (v.signBit()) {
+        v = v.copy(); v.negate();
+        signBit ^= 1;
+    }
+    if (w.signBit()) {
+        w = w.copy(); w.negate();
+        signBit ^= 1;
+    }
+
     if (w.isZero())
         throw 'division by zero';
+    
     var q = edsac.zeroValue(v.n); // quotient
     var r = edsac.zeroValue(w.n+1); // remainder
     for (var i = v.n-1; i >= 0; i--) {
@@ -272,5 +282,11 @@ edsac.valueDivRem = function(v, w) {
             q.set(i, 1);
         }
     }
+
+    if (siqnBit) {
+        v.negate();
+        w.negate();
+    }
+
     return [q, r];
 };

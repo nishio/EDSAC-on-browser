@@ -59,7 +59,9 @@ edsac.test = function() {
     edsac.assertBinary(v, '01111');
 
     edsac.assertBinary(D('2',3), '010');
+    edsac.assertBinary(D('-2',3), '110');
     edsac.assertBinary(D('42',7), '0101010');
+    edsac.assertBinary(D('-42',7), '1010110');
 
     edsac.assertEqual(B('01').compare(B('0')), 1); // 1 > 0
     edsac.assertEqual(B('01').compare(B('011')), -1); // 1 < 3

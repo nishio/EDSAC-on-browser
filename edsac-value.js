@@ -137,8 +137,13 @@ edsac.Value.prototype.printDecimal = function() {
 };
 
 // Reading decimal - we need to specify target length
-// TODO handle sign
 edsac.valueFromDecimal = function(s, n) {
+    var signBit = 0;
+    if (s.charAt(0) == '-') {
+        signBit = 1;
+        s = s.substr(1);
+    }
+
     var result = edsac.zeroValue(n);
 
     for (var i = 0; i < s.length; i++) {
@@ -146,6 +151,8 @@ edsac.valueFromDecimal = function(s, n) {
         var d = parseInt(s.charAt(i), 10);
         result.add(edsac.decimalTable[d]);
     }
+    if (signBit)
+        result.negate();
     return result;
 };
 

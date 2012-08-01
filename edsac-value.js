@@ -106,10 +106,12 @@ edsac.decimalTable = [edsac.valueFromBinary('00000'),
                       edsac.valueFromBinary('01001'),
                       edsac.valueFromBinary('01010')];
 
-// TODO handle sign
 edsac.Value.prototype.printDecimal = function() {
     // we'll divide v by 10 until it zeroes out
     var v = this.copy();
+    var signBit = v.signBit();
+    if (signBit)
+        v.negate();
 
     var s = '';
 
@@ -127,6 +129,9 @@ edsac.Value.prototype.printDecimal = function() {
     }
     if (s == '')
         s = '0';
+
+    if (signBit)
+        s = '-'+s;
 
     return s;
 };

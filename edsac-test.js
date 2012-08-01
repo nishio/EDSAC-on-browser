@@ -72,7 +72,9 @@ edsac.test = function() {
 
     edsac.assertDecimal(B('0'), '0');
     edsac.assertDecimal(B('0101010'), '42');
+    edsac.assertDecimal(B('1010110'), '-42');
     edsac.assertDecimal(B('0100101'), '37');
+    edsac.assertDecimal(B('1011011'), '-37');
 
     v = B('000');
     v.negate();

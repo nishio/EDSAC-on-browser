@@ -2,7 +2,12 @@ edsac = {};
 
 // A value, represented as a slice of backing bit array (array of 0s and 1s).
 // The bits are 'bits[start..start+n]', from youngest to oldest.
-// The value behaves as a two-complement binary word of a fixed length.
+//
+// The value behaves as a two-complement binary word. To allow for operating
+// on values of different widths, we assume that the sign bit extends,
+// e.g. '110' = '1111110'. This will likely not be used by the EDSAC emulator,
+// but makes the semantics more consistent (a negative number stays negative
+// regardless of width).
 edsac.Value = function(bits, start, n) {
     if (start == undefined)
         start = 0;
@@ -270,7 +275,7 @@ edsac.valueDivRem = function(v, w) {
 
     if (w.isZero())
         throw 'division by zero';
-    
+
     var q = edsac.zeroValue(v.n); // quotient
     var r = edsac.zeroValue(w.n+1); // remainder
     for (var i = v.n-1; i >= 0; i--) {

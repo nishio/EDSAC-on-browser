@@ -36,10 +36,20 @@ edsac.Value.prototype.set = function(i, b) {
     this.bits[this.start+i] = b;
 };
 
+// Printing and reading binary
+
 edsac.Value.prototype.printBinary = function() {
     var s = '';
-    for (var i = this.n-1; i >= 0; i--)
-        s += this.get(i);
+    for (var i = 0; i < this.n; i++)
+        s += this.get(this.n-i-1);
 
     return s;
+};
+
+edsac.valueFromBinary = function(s) {
+    var n = s.length;
+    var bits = new Array(n);
+    for (var i = 0; i < n; i++)
+        bits[n-i-1] = (s.charAt(i) == '0' ? 0 : 1);
+    return new edsac.Value(bits);
 };

@@ -16,5 +16,8 @@ edsac.test = function() {
     edsac.assertEqual(v.get(4), 1);
     edsac.assertEqual(v.printBinary(), '10000');
 
+    v = edsac.valueFromBinary('101010');
+    edsac.assertEqual(v.printBinary(), '101010');
+
     console.log('All tests OK!');
 };

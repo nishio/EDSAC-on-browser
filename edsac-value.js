@@ -106,6 +106,33 @@ edsac.decimalTable = [edsac.valueFromBinary('00000'),
                       edsac.valueFromBinary('01001'),
                       edsac.valueFromBinary('01010')];
 
+// TODO handle sign
+edsac.Value.prototype.printDecimal = function() {
+    // we'll divide v by 10 until it zeroes out
+    var v = this.copy();
+
+    var s = '';
+
+    console.log(v.printBinary());
+    while (!v.isZero()) {
+        // divide the number by 10...
+        var qr = edsac.valueDivRem(v, edsac.decimalTable[10]);
+        console.log(qr[0].printBinary()+'|'+qr[1].printBinary());
+        // the remainder is the digit we need to print
+        var r = qr[1];
+        // convert from bits to a number
+        var d = r.get(0) + 2*r.get(1) + 4*r.get(2) + 8*r.get(3);
+
+        s = String(d)+s;
+        // continue with the quotient
+        v = qr[0];
+    }
+    if (s == '')
+        s = '0';
+
+    return s;
+};
+
 // Reading decimal - we need to specify target length
 // TODO handle sign
 edsac.valueFromDecimal = function(s, n) {

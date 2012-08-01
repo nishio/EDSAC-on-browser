@@ -10,6 +10,10 @@ edsac.assertBinary = function(e1, s) {
     edsac.assertEqual(e1.printBinary(), s);
 };
 
+edsac.assertDecimal = function(e1, s) {
+    edsac.assertEqual(e1.printDecimal(), s);
+};
+
 edsac.test = function() {
     console.log('Running tests...');
 
@@ -65,6 +69,10 @@ edsac.test = function() {
     var qr = edsac.valueDivRem(B('0101010'), B('0101')); // 42 div 5 = 8, rem 2
     edsac.assertBinary(qr[0], '0001000');
     edsac.assertBinary(qr[1], '00010');
+
+    edsac.assertDecimal(B('0'), '0');
+    edsac.assertDecimal(B('0101010'), '42');
+    edsac.assertDecimal(B('0100101'), '37');
 
     console.log('All tests OK!');
 };

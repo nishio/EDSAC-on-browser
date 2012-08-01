@@ -29,6 +29,9 @@ edsac.zeroValue = function(n) {
 // easier to write.
 
 edsac.Value.prototype.get = function(i) {
+    // Outside of the array, we replicate the oldest (sign) bit
+    if (i >= this.n)
+        return this.bits[this.start+this.n-1];
     return this.bits[this.start+i];
 };
 
@@ -52,4 +55,28 @@ edsac.valueFromBinary = function(s) {
     for (var i = 0; i < n; i++)
         bits[n-i-1] = (s.charAt(i) == '0' ? 0 : 1);
     return new edsac.Value(bits);
+};
+
+// this += v
+edsac.Value.prototype.add = function(v) {
+    var carry = 0;
+    for (var i = 0; i < this.n; i++)
+    {
+        // x is in 0,1,2,3
+        var x = this.get(i) + v.get(i) + carry;
+        this.set(i, x % 2);
+        carry = (x >= 2 ? 1 : 0);
+    }
+};
+
+// this -= v
+edsac.Value.prototype.sub = function(v) {
+    var carry = 0;
+    for (var i = 0; i < this.n; i++)
+    {
+        // x is in -2,-1,0,1
+        var x = this.get(i) - v.get(i) - carry;
+        this.set(i, (x % 2 == 0 ? 0 : 1));
+        carry = (x < 0 ? 1 : 0);
+    }
 };

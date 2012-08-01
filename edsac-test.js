@@ -19,5 +19,19 @@ edsac.test = function() {
     v = edsac.valueFromBinary('101010');
     edsac.assertEqual(v.printBinary(), '101010');
 
+    v.add(edsac.valueFromBinary('011'));
+    edsac.assertEqual(v.printBinary(), '101101');
+    v.add(edsac.valueFromBinary('010011'));
+    edsac.assertEqual(v.printBinary(), '000000');
+
+    v.add(edsac.valueFromBinary('1')); // -1: the first bit is the sign bit
+    edsac.assertEqual(v.printBinary(), '111111');
+
+    v.sub(edsac.valueFromBinary('010'));
+    edsac.assertEqual(v.printBinary(), '111101');
+
+    v.sub(edsac.valueFromBinary('10')); // -2
+    edsac.assertEqual(v.printBinary(), '111111');
+
     console.log('All tests OK!');
 };

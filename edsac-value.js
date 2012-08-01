@@ -217,6 +217,12 @@ edsac.Value.prototype.sub = function(v) {
     }
 };
 
+// this &= v
+edsac.Value.prototype.and = function(v) {
+    for (var i = 0; i < this.n; i++)
+        this.set(i, this.get(i) & v.get(i));
+};
+
 // v * w
 edsac.valueMult = function(v, w) {
     var signBit = 0;

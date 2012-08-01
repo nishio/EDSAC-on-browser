@@ -50,6 +50,10 @@ edsac.test = function() {
     v.shiftRight(1);
     edsac.assertBinary(v, '111110');
 
+    v = B('000111');
+    v.and(B('111100'));
+    edsac.assertBinary(v, '000100');
+
     edsac.assertBinary(edsac.valueMult(B('011'),
                                        B('0101')),
                       '0001111');

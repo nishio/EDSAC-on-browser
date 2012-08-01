@@ -58,6 +58,11 @@ edsac.test = function() {
     v.mult(B('0101'));
     edsac.assertBinary(v, '01111');
 
+    edsac.assertDecimal(edsac.valueMult(D('10',5), D('-2',5)),
+                        '-20');
+    edsac.assertDecimal(edsac.valueMult(D('-10',5), D('-2',5)),
+                        '20');
+
     edsac.assertBinary(D('2',3), '010');
     edsac.assertBinary(D('-2',3), '110');
     edsac.assertBinary(D('42',7), '0101010');

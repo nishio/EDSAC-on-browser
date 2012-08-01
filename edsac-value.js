@@ -218,8 +218,17 @@ edsac.Value.prototype.sub = function(v) {
 };
 
 // v * w
-// TODO handle sign
 edsac.valueMult = function(v, w) {
+    var signBit = 0;
+    if (v.signBit()) {
+        v = v.copy(); v.negate();
+        signBit ^= 1;
+    }
+    if (w.signBit()) {
+        w = w.copy(); w.negate();
+        signBit ^= 1;
+    }
+
     var n = v.n + w.n;
     var result = edsac.zeroValue(n);
     var addend = w.copy(n);
@@ -229,6 +238,8 @@ edsac.valueMult = function(v, w) {
             result.add(addend);
         addend.shiftLeft(1);
     }
+    if (signBit)
+        result.negate();
     return result;
 };
 

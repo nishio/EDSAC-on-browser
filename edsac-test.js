@@ -15,6 +15,7 @@ edsac.test = function() {
 
     var v = edsac.zeroValue(5);
     var B = edsac.valueFromBinary;
+    var D = edsac.valueFromDecimal;
 
     edsac.assertBinary(v, '00000');
     edsac.assertEqual(v.get(4), 0);
@@ -52,6 +53,9 @@ edsac.test = function() {
     v = B('00011');
     v.mult(B('0101'));
     edsac.assertBinary(v, '01111');
+
+    edsac.assertBinary(D('2',3), '010');
+    edsac.assertBinary(D('42',7), '0101010');
 
     console.log('All tests OK!');
 };

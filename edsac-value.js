@@ -57,6 +57,32 @@ edsac.valueFromBinary = function(s) {
     return new edsac.Value(bits);
 };
 
+// A look-up table for the 5-bit numbers 0..10
+edsac.decimalTable = [edsac.valueFromBinary('00000'),
+                      edsac.valueFromBinary('00001'),
+                      edsac.valueFromBinary('00010'),
+                      edsac.valueFromBinary('00011'),
+                      edsac.valueFromBinary('00100'),
+                      edsac.valueFromBinary('00101'),
+                      edsac.valueFromBinary('00110'),
+                      edsac.valueFromBinary('00111'),
+                      edsac.valueFromBinary('01000'),
+                      edsac.valueFromBinary('01001'),
+                      edsac.valueFromBinary('01010')];
+
+// Reading decimal - we need to specify target length
+// TODO handle sign
+edsac.valueFromDecimal = function(s, n) {
+    var result = edsac.zeroValue(n);
+
+    for (var i = 0; i < s.length; i++) {
+        result.mult(edsac.decimalTable[10]);
+        var d = parseInt(s.charAt(i), 10);
+        result.add(edsac.decimalTable[d]);
+    }
+    return result;
+};
+
 // Return an n-bit copy
 edsac.Value.prototype.copy = function(n) {
     if (n == undefined)

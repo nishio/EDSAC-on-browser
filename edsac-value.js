@@ -57,6 +57,36 @@ edsac.valueFromBinary = function(s) {
     return new edsac.Value(bits);
 };
 
+// Return an n-bit copy
+edsac.Value.prototype.copy = function(n) {
+    if (n == undefined)
+        n = this.n;
+
+    var bits = new Array(n);
+    for (var i = 0; i < n; i++)
+        bits[i] = this.get(i);
+    return new edsac.Value(bits);
+};
+
+// this = v (assign bits)
+edsac.Value.prototype.assign = function(v) {
+    for (var i = 0; i < this.n; i++)
+        this.set(i, v.get(i));
+};
+
+// this <<= m
+edsac.Value.prototype.shiftLeft = function(m) {
+    for (var i = this.n-1; i >= 0; i--)
+        this.set(i, i >= m ? this.get(i-m) : 0);
+};
+
+// this >>= m (signed)
+edsac.Value.prototype.shiftRight = function(m) {
+    for (var i = 0; i < this.n; i++)
+        this.set(i, this.get(i+m));
+};
+
+
 // this += v
 edsac.Value.prototype.add = function(v) {
     var carry = 0;
@@ -79,4 +109,24 @@ edsac.Value.prototype.sub = function(v) {
         this.set(i, (x % 2 == 0 ? 0 : 1));
         carry = (x < 0 ? 1 : 0);
     }
+};
+
+// v * w
+// TODO handle sign
+edsac.valueMult = function(v, w) {
+    var n = v.n + w.n;
+    var result = edsac.zeroValue(n);
+    var addend = w.copy(n);
+
+    for (var i = 0; i < v.n; i++) {
+        if (v.get(i))
+            result.add(addend);
+        addend.shiftLeft(1);
+    }
+    return result;
+};
+
+// this *= v
+edsac.Value.prototype.mult = function(v) {
+    this.assign(edsac.valueMult(this, v));
 };

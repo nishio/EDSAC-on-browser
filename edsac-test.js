@@ -33,5 +33,20 @@ edsac.test = function() {
     v.sub(edsac.valueFromBinary('10')); // -2
     edsac.assertEqual(v.printBinary(), '111111');
 
+    v.shiftLeft(2);
+    edsac.assertEqual(v.printBinary(), '111100');
+
+    v.shiftRight(1);
+    edsac.assertEqual(v.printBinary(), '111110');
+
+    edsac.assertEqual(edsac.valueMult(edsac.valueFromBinary('011'),
+                                      edsac.valueFromBinary('0101'))
+                      .printBinary(),
+                      '0001111');
+
+    v = edsac.valueFromBinary('00011');
+    v.mult(edsac.valueFromBinary('0101'));
+    edsac.assertEqual(v.printBinary(), '01111');
+
     console.log('All tests OK!');
 };

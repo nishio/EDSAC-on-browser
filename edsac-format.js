@@ -1,5 +1,5 @@
 
-// Handling EDSAC character codes and instruction formatting
+// Handling EDSAC character codes and order formatting
 
 // figs: #, lets: *, null: ., cr: @, sp: !, lf: &
 // pound sign replaced with L
@@ -8,15 +8,15 @@ edsac.N_LETTERS = 32;
 edsac.LETTERS = 'PQWERTYUIOJ#SZK*.F@D!HNM&LXGABCV';
 edsac.FIGURES = '0123456789?#"+(*.$@;!L,.&)/#-?:=';
 
-// Parse an EDSAC command
-edsac.valueFromCommand = function(s) {
+// Parse an EDSAC order
+edsac.valueFromOrder = function(s) {
     var parts = /^(.)(\d*)([LS])$/.exec(s);
     if (parts == null)
-        throw 'bad command format: '+s;
+        throw 'bad order format: '+s;
 
     var result = edsac.zeroValue(17);
 
-    // Find the letter (command name)
+    // Find the letter (operation code)
     for (var i = 0; i < edsac.N_LETTERS; i++)
         if (edsac.LETTERS.charAt(i) == parts[1])
             break;
@@ -38,8 +38,8 @@ edsac.valueFromCommand = function(s) {
     return result;
 };
 
-// Print command as grouped bits
-edsac.Value.prototype.printCommandBinary = function() {
+// Print order as grouped bits
+edsac.Value.prototype.printOrderBinary = function() {
     var s = this.printBinary();
     return s.substr(0,5)+' '+s.substr(5,1)+' '+s.substr(6,10)+' '+s.substr(16,1);
 };

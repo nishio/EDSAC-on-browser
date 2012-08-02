@@ -180,6 +180,17 @@ edsac.valueFromInteger = function(m, n) {
     return result;
 };
 
+// Conversion to integer, signed or unsigned
+edsac.Value.prototype.toInteger = function(signed) {
+    var m = 0;
+    for (var i = 0; i < this.n; i++)
+        m += this.get(i)*(1<<i);
+
+    if (signed)
+        m -= this.signBit()*(1<<this.n);
+    return m;
+};
+
 // Return an n-bit copy
 edsac.Value.prototype.copy = function(n) {
     if (n == undefined)

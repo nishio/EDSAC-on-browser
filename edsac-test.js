@@ -103,6 +103,10 @@ edsac.test = function() {
     edsac.assertDecimal(B('0100101'), '37');
     edsac.assertDecimal(B('1011011'), '-37');
 
+    edsac.assertEqual(B('0101010').toInteger(true), 42);
+    edsac.assertEqual(B('1010110').toInteger(true), -42);
+    edsac.assertEqual(B('1010110').toInteger(false), 86);
+
     v = B('000');
     v.negate();
     edsac.assertBinary(v, '000');

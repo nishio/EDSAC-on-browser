@@ -117,9 +117,12 @@ edsac.test = function() {
     edsac.assertBinary(v, '1010110');
 
     edsac.assertOrderBinary(O('T123S'),
-                              '00101 0 0001111011 0');
+                            '00101 0 0001111011 0');
     edsac.assertOrderBinary(O('P10000S'),
-                              '00100 1 1100010000 0');
+                            '00100 1 1100010000 0');
+
+    edsac.assertEqual(O('T123L').printOrder(), 'T123L');
+    edsac.assertEqual(O('P10000S').printOrder(), 'R1808S');
 
     console.log('All tests OK!');
 };

@@ -33,6 +33,20 @@ edsac.valueFromOrder = function(s) {
     return result;
 };
 
+// Print an EDSAC order.
+// Warning: the encoding is one of many possible in principle,
+// due to commands like P10000S with number overwriting the higher bits, e.g.
+//  P10000S = R1808S
+edsac.Value.prototype.printOrder = function() {
+    var opNum = this.slice(12, 5).toInteger(false);
+    var num = this.slice(1, 11).toInteger(false);
+
+    return edsac.LETTERS.charAt(opNum) +
+        (num ? num : '') +
+        (this.get(0) ? 'L' : 'S');
+};
+
+
 // Print order as grouped bits
 edsac.Value.prototype.printOrderBinary = function() {
     var s = this.printBinary();

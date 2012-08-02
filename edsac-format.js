@@ -10,20 +10,15 @@ edsac.FIGURES = '0123456789?#"+(*.$@;!L,.&)/#-?:=';
 
 // Parse an EDSAC order
 edsac.valueFromOrder = function(s) {
-    var parts = /^(.)(\d*)([LS])$/.exec(s);
+    var parts = /^([A-Z#\.@!&])(\d*)([LS])$/.exec(s);
     if (parts == null)
         throw 'bad order format: '+s;
 
     var result = edsac.zeroValue(17);
 
-    // Find the letter (operation code)
-    for (var i = 0; i < edsac.N_LETTERS; i++)
-        if (edsac.LETTERS.charAt(i) == parts[1])
-            break;
-    if (i == 32)
-        throw 'unrecognized letter: '+s;
-
-    result.slice(12, 5).assign(edsac.valueFromInteger(i, 5));
+    // The operation name
+    var opNum = edsac.LETTERS.indexOf(parts[1]);
+    result.slice(12, 5).assign(edsac.valueFromInteger(opNum, 5));
 
     // The number part
     if (parts[2].length > 0) {

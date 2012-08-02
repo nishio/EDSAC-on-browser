@@ -290,7 +290,7 @@ edsac.valueDivRem = function(v, w) {
         }
     }
 
-    if (siqnBit) {
+    if (signBit) {
         v.negate();
         w.negate();
     }

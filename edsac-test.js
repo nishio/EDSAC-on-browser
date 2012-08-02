@@ -20,6 +20,7 @@ edsac.test = function() {
     var v = edsac.zeroValue(5);
     var B = edsac.valueFromBinary;
     var D = edsac.valueFromDecimal;
+    var I = edsac.valueFromInteger;
 
     edsac.assertBinary(v, '00000');
     edsac.assertEqual(v.get(4), 0);
@@ -68,9 +69,13 @@ edsac.test = function() {
                         '20');
 
     edsac.assertBinary(D('2',3), '010');
+    edsac.assertBinary(I(2,3), '010');
     edsac.assertBinary(D('-2',3), '110');
+    edsac.assertBinary(I(-2,3), '110');
     edsac.assertBinary(D('42',7), '0101010');
+    edsac.assertBinary(I(42,7), '0101010');
     edsac.assertBinary(D('-42',7), '1010110');
+    edsac.assertBinary(I(-42,7), '1010110');
 
     edsac.assertEqual(B('01').compare(B('0')), 1); // 1 > 0
     edsac.assertEqual(B('01').compare(B('011')), -1); // 1 < 3

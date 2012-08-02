@@ -161,6 +161,25 @@ edsac.valueFromDecimal = function(s, n) {
     return result;
 };
 
+// Integer functions - careful! JS floats have only ~53 bits of precision
+
+// Conversion from integer - need to specify number of bits
+edsac.valueFromInteger = function(m, n) {
+    var signBit = (m < 0 ? 1 : 0);
+    if (signBit)
+        m = -m;
+
+    var result = edsac.zeroValue(n);
+    for (var i = 0; i < n; i++)
+        if (m & (1<<i))
+            result.set(i, 1);
+
+    if (signBit)
+        result.negate();
+
+    return result;
+};
+
 // Return an n-bit copy
 edsac.Value.prototype.copy = function(n) {
     if (n == undefined)

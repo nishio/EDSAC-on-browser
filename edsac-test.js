@@ -10,6 +10,10 @@ edsac.assertBinary = function(e1, s) {
     edsac.assertEqual(e1.printBinary(), s);
 };
 
+edsac.assertCommandBinary = function(e1, s) {
+    edsac.assertEqual(e1.printCommandBinary(), s);
+};
+
 edsac.assertDecimal = function(e1, s) {
     edsac.assertEqual(e1.printDecimal(), s);
 };
@@ -21,6 +25,7 @@ edsac.test = function() {
     var B = edsac.valueFromBinary;
     var D = edsac.valueFromDecimal;
     var I = edsac.valueFromInteger;
+    var C = edsac.valueFromCommand;
 
     edsac.assertBinary(v, '00000');
     edsac.assertEqual(v.get(4), 0);
@@ -104,6 +109,11 @@ edsac.test = function() {
     v = B('0101010');
     v.negate();
     edsac.assertBinary(v, '1010110');
+
+    edsac.assertCommandBinary(C('T123S'),
+                              '00101 0 0001111011 0');
+    edsac.assertCommandBinary(C('P10000S'),
+                              '00100 1 1100010000 0');
 
     console.log('All tests OK!');
 };

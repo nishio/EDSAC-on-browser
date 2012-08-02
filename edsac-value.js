@@ -197,6 +197,11 @@ edsac.Value.prototype.assign = function(v) {
         this.set(i, v.get(i));
 };
 
+// Make a modifiable slice
+edsac.Value.prototype.slice = function(start, n) {
+    return new edsac.Value(this.bits, this.start+start, n);
+};
+
 // this <<= m
 edsac.Value.prototype.shiftLeft = function(m) {
     for (var i = this.n-1; i >= 0; i--)

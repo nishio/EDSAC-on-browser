@@ -28,6 +28,12 @@ edsac.test = function() {
     edsac.assertEqual(v.get(4), 1);
     edsac.assertBinary(v, '10000');
 
+    var w = v.slice(1, 2);
+    edsac.assertBinary(w, '00');
+    w.add(B('01'));
+    edsac.assertBinary(w, '01');
+    edsac.assertBinary(v, '10010');
+
     v = B('101010');
     edsac.assertBinary(v, '101010');
 

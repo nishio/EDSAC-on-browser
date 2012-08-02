@@ -14,8 +14,8 @@ edsac.assertCommandBinary = function(e1, s) {
     edsac.assertEqual(e1.printCommandBinary(), s);
 };
 
-edsac.assertDecimal = function(e1, s) {
-    edsac.assertEqual(e1.printDecimal(), s);
+edsac.assertDecimal = function(e1, signed, s) {
+    edsac.assertEqual(e1.printDecimal(signed), s);
 };
 
 edsac.test = function() {
@@ -75,9 +75,9 @@ edsac.test = function() {
     edsac.assertBinary(v, '01111');
 
     edsac.assertDecimal(edsac.valueMult(D('10',5), D('-2',5)),
-                        '-20');
+                        true, '-20');
     edsac.assertDecimal(edsac.valueMult(D('-10',5), D('-2',5)),
-                        '20');
+                        true, '20');
 
     edsac.assertBinary(D('2',3), '010');
     edsac.assertBinary(I(2,3), '010');
@@ -97,11 +97,13 @@ edsac.test = function() {
     edsac.assertBinary(qr[0], '0001000');
     edsac.assertBinary(qr[1], '00010');
 
-    edsac.assertDecimal(B('0'), '0');
-    edsac.assertDecimal(B('0101010'), '42');
-    edsac.assertDecimal(B('1010110'), '-42');
-    edsac.assertDecimal(B('0100101'), '37');
-    edsac.assertDecimal(B('1011011'), '-37');
+    edsac.assertDecimal(B('0'), true, '0');
+    edsac.assertDecimal(B('0101010'), true, '42');
+    edsac.assertDecimal(B('1010110'), true, '-42');
+    edsac.assertDecimal(B('1010110'), false, '86');
+    edsac.assertDecimal(B('0100101'), true, '37');
+    edsac.assertDecimal(B('1011011'), true, '-37');
+    edsac.assertDecimal(B('1011011'), false, '91');
 
     edsac.assertEqual(B('0101010').toInteger(true), 42);
     edsac.assertEqual(B('1010110').toInteger(true), -42);

@@ -111,9 +111,19 @@ edsac.decimalTable = [edsac.valueFromBinary('00000'),
                       edsac.valueFromBinary('01001'),
                       edsac.valueFromBinary('01010')];
 
-edsac.Value.prototype.printDecimal = function() {
+// Print decimal number, signed or unsigned
+edsac.Value.prototype.printDecimal = function(signed) {
     // we'll divide v by 10 until it zeroes out
-    var v = this.copy();
+    var v;
+    if (signed)
+        v = this.copy(this.n);
+    else {
+        // make an unsigned number, bigger by 1 bit
+        v = this.copy(this.n+1);
+        // set its sign bit to 0
+        v.set(this.n, 0);
+    }
+
     var signBit = v.signBit();
     if (signBit)
         v.negate();

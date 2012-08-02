@@ -186,8 +186,10 @@ edsac.Value.prototype.shiftLeft = function(m) {
 
 // this >>= m (signed)
 edsac.Value.prototype.shiftRight = function(m) {
+    var signBit = this.signBit();
     for (var i = 0; i < this.n; i++)
-        this.set(i, this.get(i+m));
+        this.set(i, i + m < this.n-1 ? this.get(i+m) : 0);
+    this.set(this.n-1, signBit);
 };
 
 // this = -this

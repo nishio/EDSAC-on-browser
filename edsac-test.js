@@ -48,7 +48,7 @@ edsac.test = function() {
     edsac.assertBinary(v, '111100');
 
     v.shiftRight(1);
-    edsac.assertBinary(v, '111110');
+    edsac.assertBinary(v, '101110');
 
     v = B('000111');
     v.and(B('111100'));

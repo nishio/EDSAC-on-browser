@@ -171,10 +171,14 @@ edsac.valueFromDecimal = function(s, n) {
     return result;
 };
 
-// Integer functions - careful! JS floats have only ~53 bits of precision
+// Integer functions - JS floats have only ~53 bits of precision,
+// so we disallow them for larger numbers
 
 // Conversion from integer - need to specify number of bits
 edsac.valueFromInteger = function(m, n) {
+    if (m != Math.floor(m))
+        throw 'not an integer';
+
     var signBit = (m < 0 ? 1 : 0);
     if (signBit)
         m = -m;
@@ -192,6 +196,9 @@ edsac.valueFromInteger = function(m, n) {
 
 // Conversion to integer, signed or unsigned
 edsac.Value.prototype.toInteger = function(signed) {
+    if (this.n >= 53)
+        throw 'value too wide';
+
     var m = 0;
     for (var i = 0; i < this.n; i++)
         m += this.get(i)*(1<<i);

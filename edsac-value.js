@@ -114,10 +114,8 @@ edsac.decimalTable = [edsac.valueFromBinary('00000'),
 // Print decimal number, signed or unsigned
 edsac.Value.prototype.printDecimal = function(signed) {
     // we'll divide v by 10 until it zeroes out
-    var v;
-    if (signed)
-        v = this.copy(this.n);
-    else {
+    var v = this;
+    if (!signed) {
         // make an unsigned number, bigger by 1 bit
         v = this.copy(this.n+1);
         // set its sign bit to 0
@@ -126,13 +124,13 @@ edsac.Value.prototype.printDecimal = function(signed) {
 
     var signBit = v.signBit();
     if (signBit)
-        v.negate();
+        v = v.negate();
 
     var s = '';
 
     while (!v.isZero()) {
         // divide the number by 10...
-        var qr = edsac.valueDivRem(v, edsac.decimalTable[10]);
+        var qr = v.divRem(edsac.decimalTable[10]);
         // the remainder is the digit we need to print
         var r = qr[1];
         // convert from bits to a number
@@ -162,12 +160,14 @@ edsac.valueFromDecimal = function(s, n) {
     var result = edsac.zeroValue(n);
 
     for (var i = 0; i < s.length; i++) {
-        result.mult(edsac.decimalTable[10]);
+        // we use 'assign' to keep the same length
+        result.assign(result.mult(edsac.decimalTable[10]));
+
         var d = parseInt(s.charAt(i), 10);
-        result.add(edsac.decimalTable[d]);
+        result = result.add(edsac.decimalTable[d]);
     }
     if (signBit)
-        result.negate();
+        result = result.negate();
     return result;
 };
 
@@ -189,7 +189,7 @@ edsac.valueFromInteger = function(m, n) {
             result.set(i, 1);
 
     if (signBit)
-        result.negate();
+        result = result.negate();
 
     return result;
 };
@@ -230,67 +230,93 @@ edsac.Value.prototype.slice = function(start, n) {
     return new edsac.Value(this.bits, this.start+start, n);
 };
 
-// this <<= m
+// this << m
 edsac.Value.prototype.shiftLeft = function(m) {
+    var r = edsac.zeroValue(this.n);
+
     for (var i = this.n-1; i >= 0; i--)
-        this.set(i, i >= m ? this.get(i-m) : 0);
+        r.set(i, i >= m ? this.get(i-m) : 0);
+
+    return r;
 };
 
-// this >>= m (signed)
+// this >> m (signed)
 edsac.Value.prototype.shiftRight = function(m) {
+    var r = edsac.zeroValue(this.n);
+
     var signBit = this.signBit();
     for (var i = 0; i < this.n; i++)
-        this.set(i, i + m < this.n-1 ? this.get(i+m) : 0);
-    this.set(this.n-1, signBit);
+        r.set(i, i + m < this.n-1 ? this.get(i+m) : 0);
+    r.set(this.n-1, signBit);
+
+    return r;
 };
 
-// this = -this
+// -this
 // (equivalent to this = ~this + 1)
 edsac.Value.prototype.negate = function() {
+    var r = edsac.zeroValue(this.n);
+
     for (var i = 0; i < this.n; i++)
-        this.set(i, 1-this.get(i));
-    this.add(new edsac.Value([1,0]));
+        r.set(i, 1-this.get(i));
+    r = r.add(new edsac.Value([1,0]));
+
+    return r;
 };
 
-// this += v
+// this + v
 edsac.Value.prototype.add = function(v) {
+    var r = edsac.zeroValue(this.n);
+
     var carry = 0;
     for (var i = 0; i < this.n; i++)
     {
         // x is in 0,1,2,3
         var x = this.get(i) + v.get(i) + carry;
-        this.set(i, x % 2);
+        r.set(i, x % 2);
         carry = (x >= 2 ? 1 : 0);
     }
+
+    return r;
 };
 
-// this -= v
+// this - v
 edsac.Value.prototype.sub = function(v) {
+    var r = edsac.zeroValue(this.n);
+
     var carry = 0;
     for (var i = 0; i < this.n; i++)
     {
         // x is in -2,-1,0,1
         var x = this.get(i) - v.get(i) - carry;
-        this.set(i, (x % 2 == 0 ? 0 : 1));
+        r.set(i, (x % 2 == 0 ? 0 : 1));
         carry = (x < 0 ? 1 : 0);
     }
+
+    return r;
 };
 
-// this &= v
+// this & v
 edsac.Value.prototype.and = function(v) {
+    var r = edsac.zeroValue(this.n);
+
     for (var i = 0; i < this.n; i++)
-        this.set(i, this.get(i) & v.get(i));
+        r.set(i, this.get(i) & v.get(i));
+
+    return r;
 };
 
-// v * w
-edsac.valueMult = function(v, w) {
+// this * w
+edsac.Value.prototype.mult = function(w) {
+    var v = this;
+
     var signBit = 0;
     if (v.signBit()) {
-        v = v.copy(); v.negate();
+        v = v.negate();
         signBit ^= 1;
     }
     if (w.signBit()) {
-        w = w.copy(); w.negate();
+        w = w.negate();
         signBit ^= 1;
     }
 
@@ -300,30 +326,27 @@ edsac.valueMult = function(v, w) {
 
     for (var i = 0; i < v.n; i++) {
         if (v.get(i))
-            result.add(addend);
-        addend.shiftLeft(1);
+            result = result.add(addend);
+        addend = addend.shiftLeft(1);
     }
     if (signBit)
-        result.negate();
+        result = result.negate();
     return result;
 };
 
-// this *= v
-edsac.Value.prototype.mult = function(v) {
-    this.assign(edsac.valueMult(this, v));
-};
-
-// [v // w, v % w]
+// [this // w, this % w]
 // The algorithm is taken from
 //   http://en.wikipedia.org/wiki/Division_%28digital%29
-edsac.valueDivRem = function(v, w) {
+edsac.Value.prototype.divRem = function(w) {
+    var v = this;
+
     var signBit = 0;
     if (v.signBit()) {
-        v = v.copy(); v.negate();
+        v = v.negate();
         signBit ^= 1;
     }
     if (w.signBit()) {
-        w = w.copy(); w.negate();
+        w = w.negate();
         signBit ^= 1;
     }
 
@@ -333,18 +356,18 @@ edsac.valueDivRem = function(v, w) {
     var q = edsac.zeroValue(v.n); // quotient
     var r = edsac.zeroValue(w.n+1); // remainder
     for (var i = v.n-1; i >= 0; i--) {
-        r.shiftLeft(1);
+        r = r.shiftLeft(1);
         r.set(0, v.get(i));
 
         if (r.compare(w) >= 0) {
-            r.sub(w);
+            r = r.sub(w);
             q.set(i, 1);
         }
     }
 
     if (signBit) {
-        q.negate();
-        r.negate();
+        q = q.negate();
+        r = r.negate();
     }
 
     return [q, r];

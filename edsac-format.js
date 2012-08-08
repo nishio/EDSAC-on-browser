@@ -23,7 +23,8 @@ edsac.valueFromOrder = function(s) {
     // The number part
     if (parts[2].length > 0) {
         var numPart = edsac.valueFromDecimal(parts[2], 16);
-        result.slice(1,16).add(numPart);
+        var numVal = result.slice(1,16);
+        numVal.assign(numVal.add(numPart));
     }
 
     // The order bit

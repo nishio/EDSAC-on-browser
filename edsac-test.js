@@ -35,52 +35,32 @@ edsac.test = function() {
 
     var w = v.slice(1, 2);
     edsac.assertBinary(w, '00');
-    w.add(B('01'));
+    w.assign(B('01'));
     edsac.assertBinary(w, '01');
     edsac.assertBinary(v, '10010');
 
-    v = B('101010');
-    edsac.assertBinary(v, '101010');
+    edsac.assertBinary(B('101010'), '101010');
+    edsac.assertBinary(B('101010').add(B('011')), '101101');
+    edsac.assertBinary(B('101101').add(B('010011')), '000000');
 
-    v.add(B('011'));
-    edsac.assertBinary(v, '101101');
-    v.add(B('010011'));
-    edsac.assertBinary(v, '000000');
+    edsac.assertBinary(B('000').add(B('1')), '111'); // add -1
+    edsac.assertBinary(B('000').add(B('01')), '001'); // add 1
+    edsac.assertBinary(B('000').sub(B('110')), '010'); // sub -2
 
-    v.add(B('1')); // -1: the first bit is the sign bit
-    edsac.assertBinary(v, '111111');
+    edsac.assertBinary(B('1111').shiftLeft(2), '1100');
+    edsac.assertBinary(B('1100').shiftRight(1), '1010');
+    edsac.assertBinary(B('0100').shiftRight(1), '0010');
 
-    v.sub(B('010'));
-    edsac.assertBinary(v, '111101');
+    edsac.assertBinary(B('000111').and(B('111100')), '000100');
 
-    v.sub(B('10')); // -2
-    edsac.assertBinary(v, '111111');
+    edsac.assertBinary(B('011').mult(B('0101')), '0001111');
 
-    v.shiftLeft(2);
-    edsac.assertBinary(v, '111100');
-
-    v.shiftRight(1);
-    edsac.assertBinary(v, '101110');
-
-    v = B('000111');
-    v.and(B('111100'));
-    edsac.assertBinary(v, '000100');
-
-    edsac.assertBinary(edsac.valueMult(B('011'),
-                                       B('0101')),
-                      '0001111');
-
-    v = B('00011');
-    v.mult(B('0101'));
-    edsac.assertBinary(v, '01111');
-
-    edsac.assertDecimal(edsac.valueMult(D('10',5), D('-2',5)),
-                        true, '-20');
-    edsac.assertDecimal(edsac.valueMult(D('-10',5), D('-2',5)),
-                        true, '20');
+    edsac.assertDecimal(D('10',5).mult(D('-2',5)), true, '-20');
+    edsac.assertDecimal(D('-10',5).mult(D('-2',5)), true, '20');
 
     edsac.assertBinary(D('2',3), '010');
     edsac.assertBinary(I(2,3), '010');
+
     edsac.assertBinary(D('-2',3), '110');
     edsac.assertBinary(I(-2,3), '110');
     edsac.assertBinary(D('42',7), '0101010');
@@ -93,7 +73,7 @@ edsac.test = function() {
     edsac.assertEqual(B('11').compare(B('10')), -1); // -1 < -2
     edsac.assertEqual(B('01').compare(B('01')), 0); // 1 == 1
 
-    var qr = edsac.valueDivRem(B('0101010'), B('0101')); // 42 div 5 = 8, rem 2
+    var qr = B('0101010').divRem(B('0101')); // 42 div 5 = 8, rem 2
     edsac.assertBinary(qr[0], '0001000');
     edsac.assertBinary(qr[1], '00010');
 
@@ -109,15 +89,12 @@ edsac.test = function() {
     edsac.assertEqual(B('1010110').toInteger(true), -42);
     edsac.assertEqual(B('1010110').toInteger(false), 86);
 
-    v = B('000');
-    v.negate();
-    edsac.assertBinary(v, '000');
-    v = B('0101010');
-    v.negate();
-    edsac.assertBinary(v, '1010110');
+    edsac.assertBinary(B('000').negate(), '000');
+    edsac.assertBinary(B('0101010').negate(), '1010110');
 
     edsac.assertOrderBinary(O('T123S'),
                             '00101 0 0001111011 0');
+
     edsac.assertOrderBinary(O('P10000S'),
                             '00100 1 1100010000 0');
 
@@ -125,7 +102,6 @@ edsac.test = function() {
     edsac.assertEqual(O('P10000S').printOrder(), 'R1808S');
 
     edsac.testSquareCode();
-
     console.log('All tests OK!');
 };
 

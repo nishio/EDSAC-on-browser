@@ -343,8 +343,8 @@ edsac.valueDivRem = function(v, w) {
     }
 
     if (signBit) {
-        v.negate();
-        w.negate();
+        q.negate();
+        r.negate();
     }
 
     return [q, r];

@@ -22,7 +22,9 @@ edsac.test = function() {
     console.log('Running tests...');
 
     edsac.testValue();
+    edsac.testSquareCode();
     edsac.testMachine();
+    edsac.testStep();
 
     console.log('All tests OK!');
 };
@@ -107,8 +109,6 @@ edsac.testValue = function() {
 
     edsac.assertEqual(O('T123L').printOrder(), 'T123L');
     edsac.assertEqual(O('P10000S').printOrder(), 'R1808S');
-
-    edsac.testSquareCode();
 };
 
 // Test if the sample code is read correctly
@@ -250,3 +250,27 @@ edsac.testMachine = function() {
     edsac.assertBinary(edsac.machine.getMult(1), s1+'0'+s0);
     edsac.assertBinary(edsac.machine.getMult(0), s1);
 };
+
+// Test code execution
+edsac.testStep = function() {
+    edsac.machine.init();
+    // Load the orders
+    for (var i = 0; i < edsac.STEP_TEST.length; i++)
+        edsac.machine.set(i, 0, edsac.valueFromOrder(edsac.STEP_TEST[i][0]));
+    while (edsac.machine.running) {
+        var ip = edsac.machine.ip;
+        edsac.machine.step();
+        edsac.assertEqual(edsac.machine.getAccum(0).printDecimal(true),
+                          edsac.STEP_TEST[ip][1]);
+    };
+};
+
+// A list of tuples: [instruction, expected A state after running it]
+edsac.STEP_TEST = [
+    ['E3S', '0'], // 0: goto 3
+    ['P1S', ''],  // 1: data 1<<1
+    ['P21S', ''], // 2: data 41<<1
+    ['A1S', '2'], // 3: A += m[1]
+    ['S2S', '-40'], // 4: A -= m[2]  (-40)
+    ['ZS', '-40']
+];

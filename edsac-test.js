@@ -21,6 +21,13 @@ edsac.assertDecimal = function(e1, signed, s) {
 edsac.test = function() {
     console.log('Running tests...');
 
+    edsac.testValue();
+    edsac.testMachine();
+
+    console.log('All tests OK!');
+};
+
+edsac.testValue = function() {
     var v = edsac.zeroValue(5);
     var B = edsac.valueFromBinary;
     var D = edsac.valueFromDecimal;
@@ -102,7 +109,6 @@ edsac.test = function() {
     edsac.assertEqual(O('P10000S').printOrder(), 'R1808S');
 
     edsac.testSquareCode();
-    console.log('All tests OK!');
 };
 
 // Test if the sample code is read correctly
@@ -214,3 +220,33 @@ edsac.SQUARE_CODE = [
     '[01001 0 0000101001 0] [121] O41S',
     '[01101 0 0000000000 0] [122] ZS'
 ];
+
+edsac.testMachine = function() {
+    edsac.machine.init();
+
+    // We test the getters and setters, as well as their width checking
+
+    // 17-bit 1- and 0-strings
+    var s1 = '11111111111111111';
+    var s0 = '00000000000000000';
+
+    var B = edsac.valueFromBinary;
+
+    edsac.machine.set(42, 1, B(s1+'0'+s1));
+    edsac.machine.set(42, 0, B(s0));
+    edsac.assertBinary(edsac.machine.get(42, 1), s1+'0'+s0);
+    edsac.assertBinary(edsac.machine.get(42, 0), s0);
+    edsac.assertBinary(edsac.machine.get(43, 0), s1);
+
+    edsac.machine.setAccum(2, B(s1+'0'+s1+'0'+s1+'0'+s1));
+    edsac.machine.setAccum(1, B(s0+'0'+s0));
+    edsac.machine.setAccum(0, B(s1));
+    edsac.assertBinary(edsac.machine.getAccum(2), s1+'0'+s0+'0'+s1+'0'+s1);
+    edsac.assertBinary(edsac.machine.getAccum(1), s1+'0'+s0);
+    edsac.assertBinary(edsac.machine.getAccum(0), s1);
+
+    edsac.machine.setMult(1, B(s0+'0'+s0));
+    edsac.machine.setMult(0, B(s1));
+    edsac.assertBinary(edsac.machine.getMult(1), s1+'0'+s0);
+    edsac.assertBinary(edsac.machine.getMult(0), s1);
+};

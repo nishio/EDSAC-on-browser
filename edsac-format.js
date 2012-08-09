@@ -27,11 +27,21 @@ edsac.valueFromOrder = function(s) {
         numVal.assign(numVal.add(numPart));
     }
 
-    // The order bit
+    // The wide bit
     if (parts[3] == 'L')
         result.set(0, 1);
 
     return result;
+};
+
+// Destructure the value as an order.
+// Returns a list [opcode letter, number, 'S'/'L']
+edsac.Value.prototype.getOrder = function() {
+    var opNum = this.slice(12, 5).toInteger(false);
+    var num = this.slice(1, 11).toInteger(false);
+    return [edsac.LETTERS.charAt(opNum),
+            (num ? num : ''),
+            this.get(0)];
 };
 
 // Print an EDSAC order.
@@ -39,12 +49,8 @@ edsac.valueFromOrder = function(s) {
 // due to commands like P10000S with number overwriting the higher bits, e.g.
 //  P10000S = R1808S
 edsac.Value.prototype.printOrder = function() {
-    var opNum = this.slice(12, 5).toInteger(false);
-    var num = this.slice(1, 11).toInteger(false);
-
-    return edsac.LETTERS.charAt(opNum) +
-        (num ? num : '') +
-        (this.get(0) ? 'L' : 'S');
+    var order = this.getOrder();
+    return order[0] + order[1] + (order[2] ? 'L' : 'S');
 };
 
 

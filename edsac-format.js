@@ -37,6 +37,9 @@ edsac.valueFromOrder = function(s) {
 // Destructure the value as an order.
 // Returns a list [opcode letter, number, 'S'/'L']
 edsac.Value.prototype.getOrder = function() {
+    if (this.n != 17)
+        throw 'wrong value width for an order';
+
     var opNum = this.slice(12, 5).toInteger(false);
     var num = this.slice(1, 11).toInteger(false);
     return [edsac.LETTERS.charAt(opNum),
@@ -56,6 +59,9 @@ edsac.Value.prototype.printOrder = function() {
 
 // Print order as grouped bits
 edsac.Value.prototype.printOrderBinary = function() {
+    if (this.n != 17)
+        throw 'wrong value width for an order';
+
     var s = this.printBinary();
     return s.substr(0,5)+' '+s.substr(5,1)+' '+s.substr(6,10)+' '+s.substr(16,1);
 };

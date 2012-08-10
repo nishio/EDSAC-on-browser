@@ -240,14 +240,13 @@ edsac.Value.prototype.shiftLeft = function(m) {
     return r;
 };
 
-// this >> m (signed)
+// this >> m (arithmetic)
 edsac.Value.prototype.shiftRight = function(m) {
     var r = edsac.zeroValue(this.n);
 
     var signBit = this.signBit();
     for (var i = 0; i < this.n; i++)
-        r.set(i, i + m < this.n-1 ? this.get(i+m) : 0);
-    r.set(this.n-1, signBit);
+        r.set(i, i + m < this.n ? this.get(i+m) : signBit);
 
     return r;
 };

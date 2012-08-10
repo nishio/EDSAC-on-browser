@@ -57,7 +57,7 @@ edsac.testValue = function() {
     edsac.assertBinary(B('000').sub(B('110')), '010'); // sub -2
 
     edsac.assertBinary(B('1111').shiftLeft(2), '1100');
-    edsac.assertBinary(B('1100').shiftRight(1), '1010');
+    edsac.assertBinary(B('1100').shiftRight(1), '1110');
     edsac.assertBinary(B('0100').shiftRight(1), '0010');
 
     edsac.assertBinary(B('000111').and(B('111100')), '000100');
@@ -293,7 +293,7 @@ edsac.STEP_TEST = [
     //  5: A -= m[3] (A=-40)
     ['S3S', '11111111111011000'],
     //  6: ABC >>= 1 (A=-20)
-    ['R0L', '10111111111101100'],
+    ['R0L', '11111111111101100'],
     //  7: ABC <<= 2 (A=-80)
     ['L1S', '11111111110110000'],
     //  8: R += m[2] (R=2)

@@ -260,17 +260,54 @@ edsac.testStep = function() {
     while (edsac.machine.running) {
         var ip = edsac.machine.ip;
         edsac.machine.step();
-        edsac.assertEqual(edsac.machine.getAccum(0).printDecimal(true),
-                          edsac.STEP_TEST[ip][1]);
+
+        var expected = edsac.STEP_TEST[ip][1];
+        if (expected != undefined) {
+            expected = expected.replace(/ /g, '');
+            while (expected.length < 71)
+                expected += '0';
+            edsac.assertEqual(edsac.machine.getAccum(2).printBinary(),
+                              expected);
+        }
     };
 };
 
-// A list of tuples: [instruction, expected A state after running it]
+// A list of tuples: [instruction(, expected ABC after running it)]
+// The ABC description may contain spaces, and omit as many junior bits
+// as we want.
+//
+// The values have been hand-crafted with the help of Python. This is not
+// intended to be a comprehensive test, we will use a real EDSAC program
+// for that.
 edsac.STEP_TEST = [
-    ['E3S', '0'], // 0: goto 3
-    ['P1S', ''],  // 1: data 1<<1
-    ['P21S', ''], // 2: data 41<<1
-    ['A1S', '2'], // 3: A += m[1]
-    ['S2S', '-40'], // 4: A -= m[2]  (-40)
-    ['ZS', '-40']
+    //  0: goto 4
+    ['E4S'],
+    //  1: data 0
+    ['P0S'],
+    //  2: data 1<<1
+    ['P1S'],
+    //  3: data 21<<1
+    ['P21S'],
+    //  4: A += m[2] (A=2)
+    ['A2S', '00000000000000010'],
+    //  5: A -= m[3] (A=-40)
+    ['S3S', '11111111111011000'],
+    //  6: ABC >>= 1 (A=-20)
+    ['R0L', '10111111111101100'],
+    //  7: ABC <<= 2 (A=-80)
+    ['L1S', '11111111110110000'],
+    //  8: R += m[2] (R=2)
+    ['H2S'],
+    //  9: AB += m[3]*R (A,B=-80, 84)
+    ['V3S', '11111111110110000 0 00000000001010100'],
+    // 10: ABC -= w[2]*RS (w[2] = (42<<18)+2, RS = 2<<18)
+    ['N2L', '11111111110101111 1 11111111111111111 1 11111111111111100 0 00000000000000000'],
+    // 11: m[1] = A, ABC = 0 (A =0b11111111110101111)
+    ['T1S', '0'],
+    // 12: AB += m[1] & R (R = 2, m[1] & R = 2)
+    ['C1S', '00000000000000000 0 00000000000000010'],
+    // 13: if A < 0 goto 0 (not executed)
+    ['G0S'],
+    // 14: stop
+    ['ZS']
 ];

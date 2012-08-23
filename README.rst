@@ -68,6 +68,9 @@ Reference
     I choose 'R = m[n]'.
 
 - http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
+
+  - You can download simulator with source code (in BCPL)
+
 - http://www.cs.clemson.edu/~mark/edsac.html
 - http://www.dcs.warwick.ac.uk/~edsac/
 

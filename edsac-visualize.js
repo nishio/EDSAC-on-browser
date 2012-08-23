@@ -18,7 +18,11 @@ edsac.Visualize.test = function(){
         var cy = margin + radius;
         var cx = margin + i * (width_of_a_bit + margin_between_bits) + radius;
         var circle = paper.circle(cx, cy, radius);
-        circle.attr("fill", "#0f0");
+        if(i % 2 == 0){
+            circle.attr("fill", "#0f0");
+        }else{
+            circle.attr("fill", "#000");
+        }
         circle.attr("stroke", "#fff");
     }
 }

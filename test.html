@@ -15,7 +15,7 @@
     $(function() {
        edsac.test();
        edsac.machine.init();
-       edsac.gui.init($('#memory'));
+       edsac.gui.init($('#memory'), $('#status'));
     });
   </script>
   <style>
@@ -23,6 +23,10 @@
        display: inline-block;
        height: 20em;
        overflow-y: scroll;
+    }
+
+    #status {
+       font-family: monospace;
     }
 
     .mem-item {
@@ -43,6 +47,7 @@
 </head>
 <body>
   For now, use the JavaScript console to test.<br>
+  <div id="status"></div>
   <div id="memory"></div>
   <div id='accumulator'></div>
 </body>

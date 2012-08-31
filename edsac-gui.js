@@ -90,6 +90,10 @@ edsac.gui.updateMemory = function(addr) {
     elt.replaceWith(this.makeMemItem(addr));
 };
 
+edsac.gui.onSet = function(addr) {
+    this.updateMemory(addr);
+};
+
 edsac.gui.step = function() {
     var oldIp = edsac.machine.ip;
     try {

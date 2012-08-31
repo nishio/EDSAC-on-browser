@@ -59,6 +59,12 @@ edsac.machine.set = function(addr, wide, value) {
         throw 'wrong value width';
 
     this.get(addr, wide).assign(value);
+
+    if (edsac.gui && edsac.gui.active) {
+        edsac.gui.onSet(addr);
+        if (wide)
+            edsac.gui.onSet(addr+1);
+    }
 };
 
 // Accumulator getters and setters,

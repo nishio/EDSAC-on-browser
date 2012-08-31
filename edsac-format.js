@@ -43,7 +43,7 @@ edsac.Value.prototype.getOrder = function() {
     var opNum = this.slice(12, 5).toInteger(false);
     var num = this.slice(1, 11).toInteger(false);
     return [edsac.LETTERS.charAt(opNum),
-            (num ? num : ''),
+            num,
             this.get(0)];
 };
 
@@ -53,9 +53,8 @@ edsac.Value.prototype.getOrder = function() {
 //  P10000S = R1808S
 edsac.Value.prototype.printOrder = function() {
     var order = this.getOrder();
-    return order[0] + order[1] + (order[2] ? 'L' : 'S');
+    return order[0] + (order[1] || '') + (order[2] ? 'L' : 'S');
 };
-
 
 // Print order as grouped bits
 edsac.Value.prototype.printOrderBinary = function() {

@@ -6,9 +6,10 @@ edsac.gui = {};
 edsac.gui.active = false;
 
 // Initialize the interface. The arguments are jQuery elements.
-edsac.gui.init = function(memory, status) {
+edsac.gui.init = function(memory, status, stepButton) {
     this.memory = memory;
     this.status = status;
+    this.stepButton = stepButton;
 
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
@@ -17,6 +18,9 @@ edsac.gui.init = function(memory, status) {
     }
 
     this.updateStatus();
+
+    var self = this;
+    this.stepButton.click(function() { self.step(); });
 
     this.active = true;
 };
@@ -77,7 +81,23 @@ edsac.gui.updateStatus = function() {
 
     html += ('RS = ' + edsac.machine.getMult(1).printDecimal(true) +
              ', R = ' + edsac.machine.getMult(0).printDecimal(true)) + '<br>';
-    html += '<br>';
 
     this.status.html(html);
+};
+
+edsac.gui.updateMemory = function(addr) {
+    var elt = this.memory.find('.mem-item.'+addr);
+    elt.replaceWith(this.makeMemItem(addr));
+};
+
+edsac.gui.step = function() {
+    var oldIp = edsac.machine.ip;
+    try {
+        edsac.machine.step();
+    } catch (err) {
+        window.alert(err);
+    }
+    this.updateStatus();
+    this.updateMemory(oldIp);
+    this.updateMemory(edsac.machine.ip);
 };

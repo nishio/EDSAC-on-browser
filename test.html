@@ -15,13 +15,14 @@
     $(function() {
        edsac.test();
        edsac.machine.init();
-       edsac.gui.init($('#memory'), $('#status'));
+       edsac.gui.init($('#memory'), $('#status'), $('#step'));
     });
   </script>
   <style>
     #memory {
        display: inline-block;
        height: 20em;
+       margin: 0.5em;
        overflow-y: scroll;
     }
 
@@ -47,7 +48,8 @@
 </head>
 <body>
   For now, use the JavaScript console to test.<br>
-  <div id="status"></div>
+  <div id="status"></div><br>
+  <input type="button" id="step" value="Step" /><br>
   <div id="memory"></div>
   <div id='accumulator'></div>
 </body>

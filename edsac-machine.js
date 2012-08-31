@@ -39,11 +39,11 @@ edsac.machine.get = function(addr, wide) {
     if (Math.round(addr) != addr ||
         (wide && (addr % 2 != 0)) ||
         addr < 0 ||
-        addr >= this.MEM_SIZE)
+        addr >= 2*this.MEM_SIZE)
 
         throw 'wrong memory address';
 
-    var word = this.mem[addr - addr % 2];
+    var word = this.mem[(addr - addr % 2)/2];
     if (wide)
         return word;
     else {

@@ -65,7 +65,8 @@ edsac.gui.makeMemItem = function(addr) {
 
 edsac.gui.updateStatus = function() {
     var html = '';
-    html += 'IP = ' + edsac.formatInt(edsac.machine.ip, 4) + '<br>';
+    html += 'IP = ' + edsac.formatInt(edsac.machine.ip, 4) +
+        (edsac.machine.running ? '' : ' (stopped)') + '<br>';
     html += '<br>';
 
     var abc = edsac.machine.getAccum(2).printBinary();
@@ -114,6 +115,8 @@ edsac.gui.step = function() {
         window.alert(err);
     }
     this.updateStatus();
+    if (!edsac.machine.running)
+        edsac.gui.stepButton.attr('disabled', true);
     this.updateMemory(oldIp);
     this.updateMemory(edsac.machine.ip);
 };

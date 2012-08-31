@@ -17,7 +17,8 @@
        edsac.test();
        edsac.machine.init();
        edsac.loadInitialOrders();
-       edsac.gui.init($('#memory'), $('#status'), $('#step'));
+       edsac.gui.init($('#memory'), $('#status'), $('#step'), $('#input'));
+       edsac.machine.setInput('T123SE84SPSPS');
     });
   </script>
   <style>
@@ -34,7 +35,7 @@
 
     .mem-item {
        font-family: monospace;
-       width: 30em;
+       width: 36em;
        margin-right: 1em;
     }
 
@@ -46,12 +47,23 @@
        background: #222;
        color: #eee;
     }
+
+    .mem-item .descr {
+       color: #777;
+       float: right;
+    }
+
+    .mem-item.current .descr{
+       color: #bbb;
+    }
+
   </style>
 </head>
 <body>
   For now, use the JavaScript console to test.<br>
   <div id="status"></div><br>
   <input type="button" id="step" value="Step" /><br>
+  Input: <input type="text" id="input"></input><br>
   <div id="memory"></div>
   <div id='accumulator'></div>
 </body>

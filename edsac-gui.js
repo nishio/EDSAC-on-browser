@@ -6,10 +6,13 @@ edsac.gui = {};
 edsac.gui.active = false;
 
 // Initialize the interface. The arguments are jQuery elements.
-edsac.gui.init = function(memory, status, stepButton) {
+edsac.gui.init = function(memory, status, stepButton, input) {
+    var self = this;
+
     this.memory = memory;
     this.status = status;
     this.stepButton = stepButton;
+    this.input = input;
 
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
@@ -19,8 +22,11 @@ edsac.gui.init = function(memory, status, stepButton) {
 
     this.updateStatus();
 
-    var self = this;
     this.stepButton.click(function() { self.step(); });
+    this.input.change(
+        function() {
+            edsac.machine.setInput(self.input.val());
+        });
 
     this.active = true;
 };
@@ -34,7 +40,8 @@ edsac.formatInt = function(n, width) {
 
 edsac.gui.MEM_TEMPLATE =
     '<div class="mem-item %addr%">' +
-    '%addr0%: [%bytes%] [%order%]' +
+    '<span class="descr">%descr%</span>' +
+    '%addr0%: [%bytes%] [%order%] ' +
     '</div>';
 
 edsac.gui.makeMemItem = function(addr) {
@@ -43,7 +50,8 @@ edsac.gui.makeMemItem = function(addr) {
                 .replace('%addr%', String(addr))
                 .replace('%addr0%', edsac.formatInt(addr,4))
                 .replace('%bytes%', val.printOrderBinary())
-                .replace('%order%', val.printOrder()));
+                .replace('%order%', val.printOrder())
+                .replace('%descr%', val.describeOrder()));
 
     var elt = $(code);
     if (addr % 2 == 1)
@@ -71,7 +79,7 @@ edsac.gui.updateStatus = function() {
 
     html += ('ABC = ' + edsac.machine.getAccum(2).printDecimal(true) +
              ', AB = ' + edsac.machine.getAccum(1).printDecimal(true) +
-             ', A = ' + edsac.machine.getAccum(1).printDecimal(true)) + '<br>';
+             ', A = ' + edsac.machine.getAccum(0).printDecimal(true)) + '<br>';
     html += '<br>';
 
     var rs = edsac.machine.getMult(1).printBinary();
@@ -92,6 +100,10 @@ edsac.gui.updateMemory = function(addr) {
 
 edsac.gui.onSet = function(addr) {
     this.updateMemory(addr);
+};
+
+edsac.gui.onSetInput = function(s) {
+    this.input.val(s);
 };
 
 edsac.gui.step = function() {

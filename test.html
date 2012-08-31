@@ -6,6 +6,7 @@
   <script src="edsac-value.js"></script>
   <script src="edsac-format.js"></script>
   <script src="edsac-machine.js"></script>
+  <script src="edsac-initial.js"></script>
   <script src="edsac-gui.js"></script>
   <script src="edsac-test.js"></script>
   <script src="jquery-1.7.2.min.js"></script>
@@ -15,6 +16,7 @@
     $(function() {
        edsac.test();
        edsac.machine.init();
+       edsac.loadInitialOrders();
        edsac.gui.init($('#memory'), $('#status'), $('#step'));
     });
   </script>

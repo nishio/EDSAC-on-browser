@@ -25,6 +25,7 @@ edsac.test = function() {
     edsac.testSquareCode();
     edsac.testMachine();
     edsac.testStep();
+    edsac.testPrinter();
 
     console.log('All tests OK!');
 };
@@ -311,3 +312,9 @@ edsac.STEP_TEST = [
     // 14: stop
     ['ZS']
 ];
+
+edsac.testPrinter = function() {
+    var pr = new edsac.Printer();
+    pr.writeTapeChars('TEST!STRING#&SECOND!LINE');
+    edsac.assertEqual(pr.getText(), 'TEST STRING\nSECOND LINE');
+};

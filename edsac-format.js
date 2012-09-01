@@ -8,13 +8,73 @@ edsac.N_LETTERS = 32;
 edsac.LETTERS = 'PQWERTYUIOJ#SZK*.F@D!HNM&LXGABCV';
 edsac.FIGURES = '0123456789?#"+(*.$@;!L,.&)/#-?:=';
 
-// Parse a single character
-edsac.valueFromChar = function(c) {
+edsac.Printer = function() {
+    this.lines = [''];
+    this.figShift = false;
+};
+
+edsac.Printer.prototype.getText = function() {
+    return this.lines.join('\n');
+};
+
+// Write an arbitrary ASCII character
+edsac.Printer.prototype.writeChar = function(c) {
+    this.lines[this.lines.length-1] += c;
+};
+
+// Write an EDSAC character, from a 5-bit integer
+edsac.Printer.prototype.writeNum = function(num) {
+    if (num < 0 || num >= edsac.N_LETTERS)
+        throw 'wrong character number';
+
+    var c = edsac.LETTERS.charAt(num);
+    if (this.figShift) {
+        this.figShift = false;
+        c = edsac.FIGURES.charAt(num);
+    }
+
+    switch(c) {
+    case '#': // figs
+        this.figShift = true;
+        break;
+
+    // CR/LF are not fully supported because we don't allow overprinting.
+    // So CR does nothing, and LF moves to a new line.
+    case '@': // lf
+        break;
+    case '&': // cr
+        this.lines.push('');
+        break;
+
+    case '!': // sp
+        this.writeChar(' ');
+        break;
+
+    default:
+        this.writeChar(c);
+        break;
+    }
+};
+
+// Write a string of EDSAC characters, encoded in the standard way.
+// Mostly for testing.
+edsac.Printer.prototype.writeTapeChars = function(s) {
+    for (var i = 0; i < s.length; ++i)
+        this.writeNum(edsac.numFromChar(s.charAt(i)));
+};
+
+edsac.numFromChar = function(c) {
     var num = edsac.LETTERS.indexOf(c);
     if (num == -1)
         num = edsac.FIGURES.indexOf(c);
     if (num == -1)
         throw 'unrecognized input character: '+c;
+    return num;
+};
+
+// Parse a single character
+edsac.valueFromChar = function(c) {
+    var num = edsac.numFromChar(c);
     return edsac.valueFromInteger(num, 5);
 };
 

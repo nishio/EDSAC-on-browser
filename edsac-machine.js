@@ -210,6 +210,7 @@ edsac.machine.step = function() {
         break;
     case 'Z':
         this.running = false;
+        this.ip -= 1; // stay on the same IP
         break;
     default:
         throw 'malformed order: '+orderVal.printOrder();

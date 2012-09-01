@@ -4,14 +4,17 @@
 edsac.gui = {};
 
 edsac.gui.active = false;
+edsac.gui.running = false;
+edsac.gui.DELAY = 50; // delay between steps in milliseconds
 
 // Initialize the interface. The arguments are jQuery elements.
-edsac.gui.init = function(memory, status, stepButton, input) {
+edsac.gui.init = function(memory, status, stepButton, runButton, input) {
     var self = this;
 
     this.memory = memory;
     this.status = status;
     this.stepButton = stepButton;
+    this.runButton = runButton;
     this.input = input;
 
     // For now, only show memory in 'narrow' mode
@@ -23,6 +26,17 @@ edsac.gui.init = function(memory, status, stepButton, input) {
     this.updateStatus();
 
     this.stepButton.click(function() { self.step(); });
+    this.stepButton.attr('disabled', false);
+
+    this.runButton.click(
+        function() {
+            if (self.running)
+                self.stop();
+            else
+                self.start();
+        });
+    this.runButton.attr('disabled', false);
+
     this.input.change(
         function() {
             edsac.machine.setInput(self.input.val());
@@ -108,15 +122,42 @@ edsac.gui.onSetInput = function(s) {
 };
 
 edsac.gui.step = function() {
+    if (!edsac.machine.running)
+        return;
+
     var oldIp = edsac.machine.ip;
     try {
         edsac.machine.step();
     } catch (err) {
         window.alert(err);
+        this.stop();
     }
     this.updateStatus();
-    if (!edsac.machine.running)
-        edsac.gui.stepButton.attr('disabled', true);
+    if (!edsac.machine.running) {
+        this.stepButton.attr('disabled', true);
+        this.runButton.attr('disabled', true);
+        this.stop();
+    }
     this.updateMemory(oldIp);
     this.updateMemory(edsac.machine.ip);
+};
+
+edsac.gui.start = function() {
+    if (!edsac.machine.running)
+        return;
+    if (this.running)
+        return;
+    var self = this;
+    this.intervalId = window.setInterval(function() { self.step(); },
+                                         this.DELAY);
+    this.running = true;
+    this.runButton.val('Stop');
+};
+
+edsac.gui.stop = function() {
+    if (!this.running)
+        return;
+    window.clearInterval(this.intervalId);
+    this.running = false;
+    this.runButton.val('Run');
 };

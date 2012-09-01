@@ -30,6 +30,7 @@ edsac.machine.init = function() {
     this.r = this.rs.slice(18, 17);
 
     this.input = '';
+    this.output = new edsac.Printer();
 
     this.running = true;
 };
@@ -121,6 +122,12 @@ edsac.machine.read = function(s) {
     return edsac.valueFromChar(c);
 };
 
+edsac.machine.writeNum = function(num) {
+    this.output.writeNum(num);
+    if (edsac.gui && edsac.gui.active)
+        edsac.gui.onSetOutput(this.output.getText());
+};
+
 // for the Y order (round)
 edsac.machine.BIT_35 = edsac.zeroValue('71');
 edsac.machine.BIT_35.set(35, 1);
@@ -189,7 +196,11 @@ edsac.machine.step = function() {
         this.set(addr, 0, val.copy(17));
         break;
     }
-    case 'O':
+    case 'O': { // output 5 highest bits of m[N] as character
+        var val = this.get(addr, false).slice(12, 5);
+        this.writeNum(val.toInteger(false));
+        break;
+    }
     case 'F':
         throw 'unimplemented opcode: ' + op;
     case 'X': // no operation

@@ -18,13 +18,14 @@
        edsac.machine.init();
        edsac.loadInitialOrders();
        edsac.gui.init($('#memory'), $('#status'), $('#step'),
-                      $('#run'), $('#input'));
-       edsac.machine.setInput('T123SE84SPSPS');
+                      $('#run'), $('#input'), $('#output'));
+       // sample program - print 4 characters and stop
+       edsac.machine.setInput('T37SO0SO1SO2SO3SZS');
     });
   </script>
   <style>
     #memory {
-       display: inline-block;
+       float: left;
        height: 20em;
        margin: 0.5em;
        overflow-y: scroll;
@@ -58,6 +59,13 @@
        color: #bbb;
     }
 
+    #output-wrapper {
+       height: 20em;
+       width: 20em;
+       padding: 0.5em;
+       overflow-y: auto;
+       background: #eee;
+    }
   </style>
 </head>
 <body>
@@ -67,6 +75,11 @@
   <br>
   Input: <input type="text" id="input"></input><br>
   <div id="memory"></div>
+  <div id="output-wrapper">
+    Output:<br>
+    <br>
+    <pre id="output"></pre>
+  </div>
   <div id='accumulator'></div>
 </body>
 </html>

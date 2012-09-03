@@ -36,7 +36,6 @@ TODO
 
 - Try other sample to run (next target is WadaSieve)
 
-  - comment: [...] and ;..(EOL)
   - ignore space and newline
   - Need visualization of memory pattern. (use canvas?)
 

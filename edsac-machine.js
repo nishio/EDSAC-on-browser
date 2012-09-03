@@ -114,6 +114,13 @@ edsac.machine.setInput = function(s) {
         edsac.gui.onSetInput(s);
 };
 
+edsac.machine.setIp = function(ip) {
+    var oldIp = this.ip;
+    this.ip = ip;
+    if (edsac.gui && edsac.gui.active)
+        edsac.gui.onSetIp(oldIp, ip);
+};
+
 edsac.machine.readNum = function(s) {
     if (this.input.length == 0)
         throw 'empty input tape';
@@ -140,7 +147,7 @@ edsac.machine.step = function() {
     var addr = order[1];
     var mode = (order[2] ? 1 : 0);
 
-    this.ip += 1;
+    var newIp = this.ip + 1;
 
     switch (op) {
     case 'A': // A/AB += mem
@@ -185,11 +192,11 @@ edsac.machine.step = function() {
     }
     case 'E': // if A >= 0 goto N
         if (this.getAccum(2).signBit() == 0)
-            this.ip = addr;
+            newIp = addr;
         break;
     case 'G': // if A < 0 goto N
         if (this.getAccum(2).signBit() == 1)
-            this.ip = addr;
+            newIp = addr;
         break;
     case 'I': { // read character into 5 lowest bits of m[N]
         var num = this.readNum();
@@ -210,9 +217,26 @@ edsac.machine.step = function() {
         break;
     case 'Z':
         this.running = false;
-        this.ip -= 1; // stay on the same IP
+        newIp -= 1; // stay on the same IP
         break;
     default:
         throw 'malformed order: '+orderVal.printOrder();
     }
+
+    this.setIp(newIp);
+};
+
+// A quick version of the 'initial orders 1' - load all orders from tape.
+edsac.machine.loadInput = function() {
+    var addr = 31;
+    while (this.input != '') {
+        var m = this.input.match(/^(.\d*[LS])/);
+        if (m == null)
+            throw 'malformed input';
+        var order = m[1];
+        this.setInput(this.input.substr(order.length));
+        this.set(addr, false, edsac.valueFromOrder(order));
+        addr++;
+    }
+    this.setIp(31);
 };

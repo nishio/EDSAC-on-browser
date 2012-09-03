@@ -137,9 +137,9 @@ edsac.Value.prototype.describeOrder = function() {
             return 'A -= m['+addr+']';
     case 'H':
         if (mode)
-            return 'RS += w['+addr+']';
+            return 'RS = w['+addr+']';
         else
-            return 'R += m['+addr+']';
+            return 'R = m['+addr+']';
     case 'V':
         if (mode)
             return 'ABC += w['+addr+'] * RS';

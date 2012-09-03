@@ -156,8 +156,9 @@ edsac.machine.step = function() {
     case 'S': // A/AB -= mem
         this.setAccum(mode, this.getAccum(mode).sub(this.get(addr, mode)));
         break;
-    case 'H': // R/RS += mem
-        this.setMult(mode, this.getMult(mode).add(this.get(addr, mode)));
+    case 'H': // R/RS = mem
+        //this.setMult(mode, this.getMult(mode).add(this.get(addr, mode)));
+        this.setMult(mode, this.get(addr, mode));
         break;
     case 'V': // AB/ABC += mem * R/RS
         this.setAccum(mode+1, this.getAccum(mode+1).add(

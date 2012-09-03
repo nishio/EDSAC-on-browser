@@ -27,15 +27,12 @@ edsac.Printer.prototype.writeNum = function(num) {
     if (num < 0 || num >= edsac.N_LETTERS)
         throw 'wrong character number';
 
-    var c = edsac.LETTERS.charAt(num);
-    if (this.figShift) {
-        this.figShift = false;
-        c = edsac.FIGURES.charAt(num);
-    }
+    var c = this.figShift ? edsac.FIGURES.charAt(num) :
+        edsac.LETTERS.charAt(num);
 
     switch(c) {
     case '#': // figs
-        this.figShift = true;
+        this.figShift = !this.figShift;
         break;
 
     // CR/LF are not fully supported because we don't allow overprinting.

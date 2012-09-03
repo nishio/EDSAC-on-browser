@@ -6,16 +6,80 @@
   <script src="edsac-value.js"></script>
   <script src="edsac-format.js"></script>
   <script src="edsac-machine.js"></script>
+  <script src="edsac-initial.js"></script>
+  <script src="edsac-gui.js"></script>
   <script src="edsac-test.js"></script>
   <script src="jquery-1.7.2.min.js"></script>
   <script src="raphael-min.js"></script>
   <script src="edsac-visualize.js"></script>
   <script>
-    edsac.test();
+    $(function() {
+       edsac.test();
+       edsac.machine.init();
+       edsac.loadInitialOrders();
+       edsac.gui.init($('#memory'), $('#status'), $('#step'),
+                      $('#run'), $('#input'), $('#output'));
+       // sample program - print 4 characters and stop
+       edsac.machine.setInput('T37SO0SO1SO2SO3SZS');
+    });
   </script>
+  <style>
+    #memory {
+       float: left;
+       height: 20em;
+       margin: 0.5em;
+       overflow-y: scroll;
+    }
+
+    #status {
+       font-family: monospace;
+    }
+
+    .mem-item {
+       font-family: monospace;
+       width: 36em;
+       margin-right: 1em;
+    }
+
+    .mem-item.odd {
+       background: #ddd;
+    }
+
+    .mem-item.current {
+       background: #222;
+       color: #eee;
+    }
+
+    .mem-item .descr {
+       color: #777;
+       float: right;
+    }
+
+    .mem-item.current .descr{
+       color: #bbb;
+    }
+
+    #output-wrapper {
+       height: 20em;
+       width: 20em;
+       padding: 0.5em;
+       overflow-y: auto;
+       background: #eee;
+    }
+  </style>
 </head>
 <body>
-  For now, use the JavaScript console to test.
+  <div id="status"></div><br>
+  <input type="button" id="step" value="Step" />
+  <input type="button" id="run" value="Run" />
+  <br>
+  Input: <input type="text" id="input"></input><br>
+  <div id="memory"></div>
+  <div id="output-wrapper">
+    Output:<br>
+    <br>
+    <pre id="output"></pre>
+  </div>
   <div id='accumulator'></div>
 </body>
 </html>

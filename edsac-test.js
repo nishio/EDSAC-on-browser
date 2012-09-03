@@ -25,6 +25,7 @@ edsac.test = function() {
     edsac.testSquareCode();
     edsac.testMachine();
     edsac.testStep();
+    edsac.testPrinter();
 
     console.log('All tests OK!');
 };
@@ -298,10 +299,10 @@ edsac.STEP_TEST = [
     ['L1S', '11111111110110000'],
     //  8: R += m[2] (R=2)
     ['H2S'],
-    //  9: AB += m[3]*R (A,B=-80, 84)
-    ['V3S', '11111111110110000 0 00000000001010100'],
+    //  9: AB += m[3]*R (A,B=-80, 336)
+    ['V3S', '11111111110110000 0 00000000101010000'],
     // 10: ABC -= w[2]*RS (w[2] = (42<<18)+2, RS = 2<<18)
-    ['N2L', '11111111110101111 1 11111111111111111 1 11111111111111100 0 00000000000000000'],
+    ['N2L', '11111111110101111 1 11111111111111111 1 11111111111110000 0 00000000000000000'],
     // 11: m[1] = A, ABC = 0 (A =0b11111111110101111)
     ['T1S', '0'],
     // 12: AB += m[1] & R (R = 2, m[1] & R = 2)
@@ -311,3 +312,9 @@ edsac.STEP_TEST = [
     // 14: stop
     ['ZS']
 ];
+
+edsac.testPrinter = function() {
+    var pr = new edsac.Printer();
+    pr.writeTapeChars('TEST!STRING#&SECOND!LINE');
+    edsac.assertEqual(pr.getText(), 'TEST STRING\nSECOND LINE');
+};

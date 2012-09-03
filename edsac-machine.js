@@ -114,12 +114,12 @@ edsac.machine.setInput = function(s) {
         edsac.gui.onSetInput(s);
 };
 
-edsac.machine.read = function(s) {
+edsac.machine.readNum = function(s) {
     if (this.input.length == 0)
         throw 'empty input tape';
     var c = this.input.charAt(0);
     this.setInput(this.input.substr(1));
-    return edsac.valueFromChar(c);
+    return edsac.numFromChar(c);
 };
 
 edsac.machine.writeNum = function(num) {
@@ -192,8 +192,8 @@ edsac.machine.step = function() {
             this.ip = addr;
         break;
     case 'I': { // read character into 5 lowest bits of m[N]
-        var val = this.read();
-        this.set(addr, 0, val.copy(17));
+        var num = this.readNum();
+        this.set(addr, 0, edsac.valueFromInteger(num, 17));
         break;
     }
     case 'O': { // output 5 highest bits of m[N] as character

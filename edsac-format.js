@@ -72,12 +72,6 @@ edsac.numFromChar = function(c) {
     return num;
 };
 
-// Parse a single character
-edsac.valueFromChar = function(c) {
-    var num = edsac.numFromChar(c);
-    return edsac.valueFromInteger(num, 5);
-};
-
 // Parse an EDSAC order
 edsac.valueFromOrder = function(s) {
     var parts = /^([A-Z#\.@!&])(\d*)([LS])$/.exec(s);

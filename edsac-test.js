@@ -315,6 +315,6 @@ edsac.STEP_TEST = [
 
 edsac.testPrinter = function() {
     var pr = new edsac.Printer();
-    pr.writeTapeChars('TEST!STRING#&SECOND!LINE');
+    pr.writeTapeChars('TEST!STRING@&SECOND!LINE');
     edsac.assertEqual(pr.getText(), 'TEST STRING\nSECOND LINE');
 };

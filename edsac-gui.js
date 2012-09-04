@@ -8,13 +8,17 @@ edsac.gui.running = false;
 edsac.gui.DELAY = 50; // delay between steps in milliseconds
 
 // Initialize the interface. The arguments are jQuery elements.
-edsac.gui.init = function(memory, status, stepButton, runButton, input, output) {
+edsac.gui.init = function(memory, status,
+                          stepButton, runButton,
+                          input, output,
+                          loadButton) {
     var self = this;
 
     this.memory = memory;
     this.status = status;
     this.stepButton = stepButton;
     this.runButton = runButton;
+    this.loadButton = loadButton;
     this.input = input;
     this.output = output;
 
@@ -43,6 +47,14 @@ edsac.gui.init = function(memory, status, stepButton, runButton, input, output) 
             edsac.machine.setInput(self.input.val());
         });
 
+    this.loadButton.click(
+        function() {
+            try {
+                edsac.machine.loadInput();
+            } catch (err) {
+                window.alert(err);
+            }
+        });
     this.active = true;
 };
 
@@ -126,11 +138,15 @@ edsac.gui.onSetOutput = function(s) {
     this.output.text(s);
 };
 
+edsac.gui.onSetIp = function(oldIp, newIp) {
+    this.updateMemory(oldIp);
+    this.updateMemory(newIp);
+};
+
 edsac.gui.step = function() {
     if (!edsac.machine.running)
         return;
 
-    var oldIp = edsac.machine.ip;
     try {
         edsac.machine.step();
     } catch (err) {
@@ -141,10 +157,9 @@ edsac.gui.step = function() {
     if (!edsac.machine.running) {
         this.stepButton.attr('disabled', true);
         this.runButton.attr('disabled', true);
+        this.loadButton.attr('disabled', true);
         this.stop();
     }
-    this.updateMemory(oldIp);
-    this.updateMemory(edsac.machine.ip);
 };
 
 edsac.gui.start = function() {

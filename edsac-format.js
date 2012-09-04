@@ -27,15 +27,12 @@ edsac.Printer.prototype.writeNum = function(num) {
     if (num < 0 || num >= edsac.N_LETTERS)
         throw 'wrong character number';
 
-    var c = edsac.LETTERS.charAt(num);
-    if (this.figShift) {
-        this.figShift = false;
-        c = edsac.FIGURES.charAt(num);
-    }
+    var c = this.figShift ? edsac.FIGURES.charAt(num) :
+        edsac.LETTERS.charAt(num);
 
     switch(c) {
     case '#': // figs
-        this.figShift = true;
+        this.figShift = !this.figShift;
         break;
 
     // CR/LF are not fully supported because we don't allow overprinting.
@@ -70,12 +67,6 @@ edsac.numFromChar = function(c) {
     if (num == -1)
         throw 'unrecognized input character: '+c;
     return num;
-};
-
-// Parse a single character
-edsac.valueFromChar = function(c) {
-    var num = edsac.numFromChar(c);
-    return edsac.valueFromInteger(num, 5);
 };
 
 // Parse an EDSAC order
@@ -146,9 +137,9 @@ edsac.Value.prototype.describeOrder = function() {
             return 'A -= m['+addr+']';
     case 'H':
         if (mode)
-            return 'RS += w['+addr+']';
+            return 'RS = w['+addr+']';
         else
-            return 'R += m['+addr+']';
+            return 'R = m['+addr+']';
     case 'V':
         if (mode)
             return 'ABC += w['+addr+'] * RS';

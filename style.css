@@ -33,7 +33,9 @@
 }
 
 #edsac-status {
+    width: 37em;
     margin: 0em;
+    overflow-x: auto;
 }
 
 .mem-item {
@@ -71,8 +73,4 @@
 #edsac-source {
     width: 100%;
     height: 280px;
-}
-
-#machine-top-container {
-    width: 30em;
 }

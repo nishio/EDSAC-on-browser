@@ -55,7 +55,12 @@ edsac.vis.init = function(prefix) {
     $(this.memCanvas).click(
         function(event) {
             var pos = self.relMouseCoords(this, event);
-            edsac.gui.scrollToMemory(Math.max(0, pos.y*2-8));
+            var addr = Math.max(0, pos.y*2-8);
+
+            edsac.gui.scrollToMemory(addr);
+
+            var tankNumber = Math.floor(addr/(self.TANK_HEIGHT*2));
+            self.switchToTank(tankNumber);
         });
 };
 

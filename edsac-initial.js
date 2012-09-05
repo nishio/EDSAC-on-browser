@@ -1,4 +1,4 @@
-edsac.INITIAL_ORDERS = [
+edsac.INITIAL_ORDERS_1 = [
     '[0] T0S',
     '[1] H2S',
     '[2] T0S',
@@ -32,9 +32,57 @@ edsac.INITIAL_ORDERS = [
     '[30] G6S'
 ];
 
-edsac.loadInitialOrders = function() {
-    for (var i = 0; i < edsac.INITIAL_ORDERS.length; i++) {
-        var line = edsac.INITIAL_ORDERS[i];
+edsac.INITIAL_ORDERS_2 = [
+    '[0] TS',
+    '[1] E20S',
+    '[2] P1S',
+    '[3] U2S',
+    '[4] A39S',
+    '[5] R4S',
+    '[6] VS',
+    '[7] L8S',
+    '[8] TS',
+    '[9] I1S',
+    '[10] A1S',
+    '[11] S39S',
+    '[12] G4S',
+    '[13] LL',
+    '[14] S39S',
+    '[15] E17S',
+    '[16] S7S',
+    '[17] A35S',
+    '[18] T20S',
+    '[19] AS',
+    '[20] H8S',
+    '[21] A40S',
+    '[22] T43S',
+    '[23] A22S',
+    '[24] A2S',
+    '[25] T22S',
+    '[26] E34S',
+    '[27] A43S',
+    '[28] E8S',
+    '[29] A42S',
+    '[30] A40S',
+    '[31] E25S',
+    '[32] A22S',
+    '[33] T42S',
+    '[34] I40L',
+    '[35] A40L',
+    '[36] R16S',
+    '[37] T40L',
+    '[38] E8S',
+    '[39] P5L',
+    '[40] PL'
+];
+
+edsac.loadInitialOrders = function(ver) {
+    if (ver == undefined)
+        ver = 1;
+    var orders = ver == 1 ? edsac.INITIAL_ORDERS_1 : edsac.INITIAL_ORDERS_2;
+
+    for (var i = 0; i < orders.length; i++) {
+        var line = orders[i];
         var parts = /^\[(\d+)\] (.+)$/.exec(line);
 
         if (i != parseInt(parts[1], 10))

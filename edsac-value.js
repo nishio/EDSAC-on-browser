@@ -240,7 +240,7 @@ edsac.Value.prototype.shiftLeft = function(m) {
 };
 
 // this >> m (arithmetic)
-edsac.Value.prototype.shiftRight = function(m) {
+edsac.Value.prototype.shiftArithmeticRight = function(m) {
     var r = edsac.zeroValue(this.n);
 
     var signBit = this.signBit();
@@ -249,6 +249,17 @@ edsac.Value.prototype.shiftRight = function(m) {
 
     return r;
 };
+
+// this >>> m (logical)
+edsac.Value.prototype.shiftRight = function(m) {
+    var r = edsac.zeroValue(this.n);
+
+    for (var i = 0; i < this.n; i++)
+        r.set(i, i + m < this.n ? this.get(i+m) : 0);
+
+    return r;
+};
+
 
 // -this
 // (equivalent to this = ~this + 1)

@@ -14,6 +14,7 @@
   <script src="jquery-ui.min.js"></script>
   <link rel="stylesheet" type="text/css"
         href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="style.css">
 
   <!-- <script src="raphael-min.js"></script>
   <script src="edsac-visualize.js"></script> -->
@@ -29,84 +30,6 @@
        // edsac.machine.setInput('T123SE84SPSPSP10000SP1000SP100SP10SP1SQS#SA40S!S&S@SO43SO33SPSA46ST65ST129SA35ST34SE61ST48SA47ST65SA33SA40ST33SA48SS34SE55SA34SPST48ST33SA52SA4SU52SS42SG51SA117ST52SPSPSPSPSPSE110SE118SP100SE95SO41ST129SO44SO45SA76SA4SU76ST48SA83ST75SE49SO43SO43SH76SV76SL64SL32SU77SS78ST79SA77SU78ST48SA80ST75SE49SO43SO43SA79ST48SA81ST75SE49SA35SA76SS82SG85SO41SZS');
     });
   </script>
-  <style>
-    #memory-container {
-       width: 40px;
-       vertical-align: top;
-    }
-
-    #tabs-container {
-       vertical-align: top;
-    }
-
-    #edsac-memory-canvas {
-       margin: 0.5em;
-       float: left;
-    }
-
-    #tabs {
-       font-family: Times, serif;
-       font-size: 1em;
-    }
-
-    #tabs input {
-       font-size: 0.9em;
-    }
-    #tabs .ui-tabs-panel { padding: 0.2em; }
-    #tabs .ui-tabs-nav li a { padding: 0.2em 0.6em; }
-    #tabs textarea {
-       font-family: monospace;
-       font-size: 12px;
-    }
-
-    #edsac-memory {
-       float: left;
-       height: 19em;
-       margin: 0.5em;
-       overflow-y: scroll;
-    }
-
-    #edsac-status {
-       margin: 0em;
-    }
-
-    .mem-item {
-       font-family: monospace;
-       width: 36em;
-       margin-right: 1em;
-    }
-
-    .mem-item.odd {
-       background: #ddd;
-    }
-
-    .mem-item.current {
-       background: #222;
-       color: #eee;
-    }
-
-    .mem-item .descr {
-       color: #777;
-       float: right;
-    }
-
-    .mem-item.current .descr{
-       color: #bbb;
-    }
-
-    #edsac-output-wrapper {
-       height: 19em;
-       width: 20em;
-       padding: 0.5em;
-       overflow-y: auto;
-       background: #eee;
-    }
-
-    #edsac-source {
-      width: 100%;
-      height: 280px;
-    }
-  </style>
 </head>
 <body>
 <table style="width: 100%;">

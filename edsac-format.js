@@ -50,6 +50,9 @@ edsac.Printer.prototype.writeNum = function(num) {
         this.writeChar(' ');
         break;
 
+    case '.': // null
+        break;
+
     default:
         this.writeChar(c);
         break;

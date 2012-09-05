@@ -170,7 +170,7 @@ edsac.gui.onSetIp = function(oldIp, newIp) {
 
 edsac.gui.step = function() {
     if (!edsac.machine.running)
-        return;
+        edsac.machine.running = true;
 
     try {
         edsac.machine.step();
@@ -179,19 +179,16 @@ edsac.gui.step = function() {
         this.stop();
     }
     this.updateStatus();
-    if (!edsac.machine.running) {
-        this.stepButton.attr('disabled', true);
-        this.runButton.attr('disabled', true);
-        this.loadButton.attr('disabled', true);
+    if (!edsac.machine.running)
         this.stop();
-    }
 };
 
 edsac.gui.start = function() {
-    if (!edsac.machine.running)
-        return;
     if (this.running)
         return;
+    if (!edsac.machine.running)
+        edsac.machine.running = true;
+    
     var self = this;
     this.intervalId = window.setInterval(function() { self.step(); },
                                          this.DELAY);

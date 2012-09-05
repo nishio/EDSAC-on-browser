@@ -237,9 +237,8 @@ edsac.machine.step = function() {
     case 'Y': // ABC += {1 at bit 35} (34 counting from the left)
         this.setAccum(2, this.getAccum(2).add(this.BIT_35));
         break;
-    case 'Z':
+    case 'Z': // stop
         this.running = false;
-        newIp -= 1; // stay on the same IP
         break;
     default:
         throw 'malformed order: '+orderVal.printOrder();

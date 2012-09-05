@@ -31,6 +31,7 @@ edsac.machine.init = function() {
 
     this.input = '';
     this.output = new edsac.Printer();
+    this.lastOutput = 0;
 
     this.running = true;
 };
@@ -41,6 +42,7 @@ edsac.machine.reset = function() {
     this.setMult(1, edsac.zeroValue(35));
     for (var i = 0; i < this.MEM_SIZE; ++i)
         this.set(2*i, 1, edsac.zeroValue(35));
+    this.lastOutput = 0;
     this.running = true;
 };
 
@@ -144,6 +146,7 @@ edsac.machine.readNum = function(s) {
 
 edsac.machine.writeNum = function(num) {
     this.output.writeNum(num);
+    this.lastOutput = num;
     if (edsac.gui && edsac.gui.active)
         edsac.gui.onSetOutput(this.output.getText());
 };
@@ -230,8 +233,15 @@ edsac.machine.step = function() {
         this.writeNum(val.toInteger(false));
         break;
     }
-    case 'F':
-        throw 'unimplemented opcode: ' + op;
+    case 'F': { // load last output to memory
+        var val;
+        if (mode == 0)
+            val = edsac.valueFromInteger(num, 35).shiftLeft(12);
+        else
+            val = edsac.valueFromInteger(num, 35).shiftLeft(30);
+        this.set(addr, mode, val);
+        break;
+    }
     case 'X': // no operation
         break;
     case 'Y': // ABC += {1 at bit 35} (34 counting from the left)

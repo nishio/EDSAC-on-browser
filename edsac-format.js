@@ -193,7 +193,10 @@ edsac.Value.prototype.describeOrder = function() {
         else
             return 'write(m['+addr+'])';
     case 'F':
-        return 'verify';
+        if (mode)
+            return 'w['+addr+'] = last';
+        else
+            return 'm['+addr+'] = last';
     case 'Y':
         return 'round ABC';
     case 'Z':

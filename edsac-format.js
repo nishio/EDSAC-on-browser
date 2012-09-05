@@ -32,7 +32,10 @@ edsac.Printer.prototype.writeNum = function(num) {
 
     switch(c) {
     case '#': // figs
-        this.figShift = !this.figShift;
+        this.figShift = true;
+        break;
+    case '*': // lets
+        this.figShift = false;
         break;
 
     // CR/LF are not fully supported because we don't allow overprinting.

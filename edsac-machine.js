@@ -176,14 +176,20 @@ edsac.machine.step = function() {
         //this.setMult(mode, this.getMult(mode).add(this.get(addr, mode)));
         this.setMult(mode, this.get(addr, mode));
         break;
-    case 'V': // AB/ABC += mem * R/RS
-        this.setAccum(mode+1, this.getAccum(mode+1).add(
-                          this.get(addr, mode).mult(this.getMult(mode)).shiftLeft(2)));
+    case 'V': { // AB/ABC += mem * R/RS
+        var v = this.get(addr, mode).mult(this.getMult(mode));
+        // extend by 1 bit
+        v = v.copy(v.n+1);
+        this.setAccum(mode+1, this.getAccum(mode+1).add(v.shiftLeft(2)));
         break;
-    case 'N': // AB/ABC -= mem * R/RS
-        this.setAccum(mode+1, this.getAccum(mode+1).sub(
-                          this.get(addr, mode).mult(this.getMult(mode)).shiftLeft(2)));
+    }
+    case 'N': { // AB/ABC -= mem * R/RS
+        var v = this.get(addr, mode).mult(this.getMult(mode));
+        // extend by 1 bit
+        v = v.copy(v.n+1);
+        this.setAccum(mode+1, this.getAccum(mode+1).sub(v.shiftLeft(2)));
         break;
+    }
     case 'U': // mem = A/AB
         this.set(addr, mode, this.getAccum(mode));
         break;

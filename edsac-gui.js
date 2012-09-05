@@ -24,8 +24,6 @@ edsac.gui.init = function(prefix) {
     this.switchButton = $(prefix+'switch');
     this.switchButton.val('Switch to Initial Orders 2');
 
-    this.source = $(prefix+'source');
-
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
         var item = this.makeMemItem(i);
@@ -84,6 +82,7 @@ edsac.gui.init = function(prefix) {
     );
 
     this.active = true;
+    edsac.vis.init(prefix);
 };
 
 edsac.formatInt = function(n, width) {
@@ -156,6 +155,7 @@ edsac.gui.updateMemory = function(addr) {
 
 edsac.gui.onSet = function(addr) {
     this.updateMemory(addr);
+    edsac.vis.drawMemory(addr - addr%2);
 };
 
 edsac.gui.onSetInput = function(s) {

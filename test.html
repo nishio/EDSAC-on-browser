@@ -8,6 +8,7 @@
   <script src="edsac-machine.js"></script>
   <script src="edsac-initial.js"></script>
   <script src="edsac-gui.js"></script>
+  <script src="edsac-vis.js"></script>
   <script src="edsac-test.js"></script>
   <script src="jquery-1.7.2.min.js"></script>
   <script src="jquery-ui.min.js"></script>
@@ -29,10 +30,25 @@
     });
   </script>
   <style>
+    #memory-container {
+       width: 40px;
+       vertical-align: top;
+    }
+
+    #tabs-container {
+       vertical-align: top;
+    }
+
+    #edsac-memory-canvas {
+       margin: 0.5em;
+       float: left;
+    }
+
     #tabs {
        font-family: Times, serif;
        font-size: 1em;
     }
+
     #tabs input {
        font-size: 0.9em;
     }
@@ -93,7 +109,12 @@
   </style>
 </head>
 <body>
-
+<table style="width: 100%;">
+<tr>
+<td id="memory-container">
+  <canvas id="edsac-memory-canvas"></canvas>
+</td>
+<td id="tabs-container">
   <div id="tabs">
     <ul>
       <li><a href="#machine-tab">Machine</a></li>
@@ -158,6 +179,9 @@ EZPF
     </div> <!-- source-tab -->
 
   </div> <!-- tabs -->
+</td>
+</tr>
+</table>
 
 </body>
 </html>

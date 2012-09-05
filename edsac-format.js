@@ -180,9 +180,15 @@ edsac.Value.prototype.describeOrder = function() {
     case 'G':
         return 'if A < 0 goto '+addr;
     case 'I':
-        return 'm['+addr+'] = read()';
+        if (mode)
+            return 'w['+addr+'] = read()';
+        else
+            return 'm['+addr+'] = read()';
     case 'O':
-        return 'write(m['+addr+'])';
+        if (mode)
+            return 'write(w['+addr+'])';
+        else
+            return 'write(m['+addr+'])';
     case 'F':
         return 'verify';
     case 'Y':

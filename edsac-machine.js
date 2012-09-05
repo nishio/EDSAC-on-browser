@@ -200,12 +200,20 @@ edsac.machine.step = function() {
             newIp = addr;
         break;
     case 'I': { // read character into 5 lowest bits of m[N]
+                // or 5 middle bits of w[N]
         var num = this.readNum();
-        this.set(addr, 0, edsac.valueFromInteger(num, 17));
+        if (mode == 0)
+            this.set(addr, 0, edsac.valueFromInteger(num, 17));
+        else
+            this.set(addr, 1, edsac.valueFromInteger(num, 35).shiftLeft(18));
         break;
     }
-    case 'O': { // output 5 highest bits of m[N] as character
-        var val = this.get(addr, false).slice(12, 5);
+    case 'O': { // output 5 highest bits of m[N]/w[N] as character
+        var val;
+        if (mode == 0)
+            val = this.get(addr, 0).slice(12, 5);
+        else
+            val = this.get(addr, 1).slice(30, 5);
         this.writeNum(val.toInteger(false));
         break;
     }

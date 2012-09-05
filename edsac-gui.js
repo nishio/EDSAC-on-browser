@@ -38,7 +38,7 @@ edsac.gui.init = function(prefix) {
 
     this.stepButton.click(
         function() {
-            self.stop();
+            self.pause();
             self.step();
         });
     this.stepButton.attr('disabled', false);
@@ -46,7 +46,7 @@ edsac.gui.init = function(prefix) {
     this.runButton.click(
         function() {
             if (self.running)
-                self.stop();
+                self.pause();
             else
                 self.start();
         });
@@ -54,7 +54,7 @@ edsac.gui.init = function(prefix) {
 
     this.resetButton.click(
         function() {
-            self.stop();
+            self.pause();
             edsac.machine.reset();
             edsac.loadInitialOrders(self.ordersVer);
             self.updateStatus();
@@ -78,7 +78,7 @@ edsac.gui.init = function(prefix) {
         function() {
             var newVer = 3-self.ordersVer;
 
-            self.stop();
+            self.pause();
             edsac.machine.reset();
             edsac.loadInitialOrders(newVer);
             self.updateStatus();
@@ -193,11 +193,11 @@ edsac.gui.step = function() {
         edsac.machine.step();
     } catch (err) {
         window.alert(err);
-        this.stop();
+        this.pause();
     }
     this.updateStatus();
     if (!edsac.machine.running)
-        this.stop();
+        this.pause();
 };
 
 edsac.gui.start = function() {
@@ -210,10 +210,10 @@ edsac.gui.start = function() {
     this.intervalId = window.setInterval(function() { self.step(); },
                                          this.DELAY);
     this.running = true;
-    this.runButton.val('Stop');
+    this.runButton.val('Pause');
 };
 
-edsac.gui.stop = function() {
+edsac.gui.pause = function() {
     if (!this.running)
         return;
     window.clearInterval(this.intervalId);

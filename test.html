@@ -17,21 +17,20 @@
        edsac.test();
        edsac.machine.init();
        edsac.loadInitialOrders();
-       edsac.gui.init($('#memory'), $('#status'), $('#step'),
-                      $('#run'), $('#input'), $('#output'), $('#load'));
+       edsac.gui.init('#edsac-');
        // sample program - print 4 characters and stop
        edsac.machine.setInput('T123SE84SPSPSP10000SP1000SP100SP10SP1SQS#SA40S!S&S@SO43SO33SPSA46ST65ST129SA35ST34SE61ST48SA47ST65SA33SA40ST33SA48SS34SE55SA34SPST48ST33SA52SA4SU52SS42SG51SA117ST52SPSPSPSPSPSE110SE118SP100SE95SO41ST129SO44SO45SA76SA4SU76ST48SA83ST75SE49SO43SO43SH76SV76SL64SL32SU77SS78ST79SA77SU78ST48SA80ST75SE49SO43SO43SA79ST48SA81ST75SE49SA35SA76SS82SG85SO41SZS');
     });
   </script>
   <style>
-    #memory {
+    #edsac-memory {
        float: left;
        height: 20em;
        margin: 0.5em;
        overflow-y: scroll;
     }
 
-    #status {
+    #edsac-status {
        font-family: monospace;
     }
 
@@ -59,7 +58,7 @@
        color: #bbb;
     }
 
-    #output-wrapper {
+    #edsac-output-wrapper {
        height: 20em;
        width: 20em;
        padding: 0.5em;
@@ -69,18 +68,18 @@
   </style>
 </head>
 <body>
-  <div id="status"></div><br>
-  <input type="button" id="step" value="Step" />
-  <input type="button" id="run" value="Run" />
+  <div id="edsac-status"></div><br>
+  <input type="button" id="edsac-step" value="Step" />
+  <input type="button" id="edsac-run" value="Run" />
   <br>
-  Input: <input type="text" id="input"></input>
-  <input type="button" id="load" value="Load" />
+  Input: <input type="text" id="edsac-input"></input>
+  <input type="button" id="edsac-load" value="Load" />
   <br>
-  <div id="memory"></div>
-  <div id="output-wrapper">
+  <div id="edsac-memory"></div>
+  <div id="edsac-output-wrapper">
     Output:<br>
     <br>
-    <pre id="output"></pre>
+    <pre id="edsac-output"></pre>
   </div>
   <div id='accumulator'></div>
 </body>

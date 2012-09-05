@@ -7,25 +7,22 @@ edsac.gui.active = false;
 edsac.gui.running = false;
 edsac.gui.DELAY = 50; // delay between steps in milliseconds
 
-// Initialize the interface. The arguments are jQuery elements.
-edsac.gui.init = function(memory, status,
-                          stepButton, runButton,
-                          input, output,
-                          loadButton) {
+// Initialize the interface. 'prefix' is a prefix for jQuery selector.
+edsac.gui.init = function(prefix) {
     var self = this;
 
-    this.memory = memory;
-    this.status = status;
-    this.stepButton = stepButton;
-    this.runButton = runButton;
-    this.loadButton = loadButton;
-    this.input = input;
-    this.output = output;
+    this.memory = $(prefix+'memory');
+    this.status = $(prefix+'status');
+    this.stepButton = $(prefix+'step');
+    this.runButton = $(prefix+'run');
+    this.loadButton = $(prefix+'load');
+    this.input = $(prefix+'input');
+    this.output = $(prefix+'output');
 
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
         var item = this.makeMemItem(i);
-        memory.append(item);
+        this.memory.append(item);
     }
 
     this.updateStatus();

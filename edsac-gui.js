@@ -153,6 +153,13 @@ edsac.gui.updateMemory = function(addr) {
     elt.replaceWith(this.makeMemItem(addr));
 };
 
+edsac.gui.scrollToMemory = function(addr) {
+    var elt = this.memory.find('.mem-item.'+addr);
+    var elt0 = this.memory.find('.mem-item.'+0);
+    var offset = elt.offset().top - elt0.offset().top;
+    this.memory.scrollTop(offset);
+};
+
 edsac.gui.onSet = function(addr) {
     this.updateMemory(addr);
     edsac.vis.drawMemory(addr - addr%2);

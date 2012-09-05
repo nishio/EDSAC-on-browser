@@ -173,9 +173,9 @@ edsac.Value.prototype.describeOrder = function() {
             return 'm['+addr+'] = A';
     case 'C':
         if (mode)
-            return 'ABC += w['+addr+'] & RS';
+            return 'AB += w['+addr+'] & RS';
         else
-            return 'AB += m['+addr+'] & R';
+            return 'A += m['+addr+'] & R';
     case 'R':
     case 'L': {
         var i = 0;

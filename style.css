@@ -9,7 +9,6 @@
 
 #edsac-memory-canvas {
     margin: 0.5em;
-    float: left;
 }
 
 #tabs {
@@ -28,7 +27,6 @@
 }
 
 #edsac-memory {
-    float: left;
     height: 19em;
     margin: 0.5em;
     overflow-y: scroll;
@@ -62,7 +60,7 @@
     color: #bbb;
 }
 
-#edsac-output-wrapper {
+#output-container {
     height: 19em;
     width: 20em;
     padding: 0.5em;
@@ -73,4 +71,8 @@
 #edsac-source {
     width: 100%;
     height: 280px;
+}
+
+#machine-top-container {
+    width: 30em;
 }

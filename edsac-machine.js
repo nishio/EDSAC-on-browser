@@ -14,7 +14,7 @@ edsac.machine.init = function() {
     for (var i = 0; i < this.mem.length; ++i)
         this.mem[i] = edsac.zeroValue(35);
 
-    // Instruction pointer
+    // Instruction pointer (SCR)
     this.ip = 0;
 
     // 71-bit accumulator

@@ -92,7 +92,7 @@ edsac.gui.makeMemItem = function(addr) {
 
 edsac.gui.updateStatus = function() {
     var html = '';
-    html += 'IP = ' + edsac.formatInt(edsac.machine.ip, 4) +
+    html += 'SCR = ' + edsac.formatInt(edsac.machine.ip, 4) +
         (edsac.machine.running ? '' : ' (stopped)') + '<br>';
     html += '<br>';
 

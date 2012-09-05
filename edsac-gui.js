@@ -13,9 +13,9 @@ edsac.gui.init = function(prefix) {
 
     this.memory = $(prefix+'memory');
     this.status = $(prefix+'status');
-    this.stepButton = $(prefix+'step');
-    this.runButton = $(prefix+'run');
-    this.loadButton = $(prefix+'load');
+    this.stepButton = $(prefix+'step'); this.stepButton.val('Step');
+    this.runButton = $(prefix+'run'); this.runButton.val('Run');
+    this.loadButton = $(prefix+'load'); this.loadButton.val('Load');
     this.input = $(prefix+'input');
     this.output = $(prefix+'output');
 

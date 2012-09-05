@@ -9,6 +9,10 @@ edsac.gui.DELAY = 50; // delay between steps in milliseconds
 
 // Initialize the interface. 'prefix' is a prefix for jQuery selector.
 edsac.gui.init = function(prefix) {
+    this.ordersVer = 2;
+    edsac.machine.init();
+    edsac.loadInitialOrders(this.ordersVer);
+
     var self = this;
 
     this.memory = $(prefix+'memory');
@@ -17,12 +21,12 @@ edsac.gui.init = function(prefix) {
     this.runButton = $(prefix+'run'); this.runButton.val('Run');
     this.resetButton = $(prefix+'reset'); this.resetButton.val('Reset');
     this.loadButton = $(prefix+'load'); this.loadButton.val('Load source');
-    this.input = $(prefix+'input');
+    this.input = $(prefix+'input'); this.input.val('');
     this.output = $(prefix+'output');
     this.source = $(prefix+'source');
 
     this.switchButton = $(prefix+'switch');
-    this.switchButton.val('Switch to Initial Orders 2');
+    this.switchButton.val('Switch to Initial Orders '+(3-this.ordersVer));
 
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
@@ -70,10 +74,9 @@ edsac.gui.init = function(prefix) {
             edsac.machine.setInput(source);
         });
 
-    this.ordersVer = 1;
     this.switchButton.click(
         function() {
-            var newVer = self.ordersVer == 1 ? 2 : 1;
+            var newVer = 3-self.ordersVer;
 
             self.stop();
             edsac.machine.reset();

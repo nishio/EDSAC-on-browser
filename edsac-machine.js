@@ -236,9 +236,9 @@ edsac.machine.step = function() {
     case 'F': { // load last output to memory
         var val;
         if (mode == 0)
-            val = edsac.valueFromInteger(num, 35).shiftLeft(12);
+            val = edsac.valueFromInteger(this.lastOutput, 17).shiftLeft(12);
         else
-            val = edsac.valueFromInteger(num, 35).shiftLeft(30);
+            val = edsac.valueFromInteger(this.lastOutput, 35).shiftLeft(30);
         this.set(addr, mode, val);
         break;
     }

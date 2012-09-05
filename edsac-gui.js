@@ -135,7 +135,7 @@ edsac.gui.onSetInput = function(s) {
 };
 
 edsac.gui.onSetOutput = function(s) {
-    this.output.text(s);
+    this.output.text(s+'_');
 };
 
 edsac.gui.onSetIp = function(oldIp, newIp) {

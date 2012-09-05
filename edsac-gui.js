@@ -5,7 +5,8 @@ edsac.gui = {};
 
 edsac.gui.active = false;
 edsac.gui.running = false;
-edsac.gui.DELAY = 50; // delay between steps in milliseconds
+edsac.gui.DELAY = 50;
+edsac.gui.STEPS_PER_INTERVAL = 5;
 
 // Initialize the interface. 'prefix' is a prefix for jQuery selector.
 edsac.gui.init = function(prefix) {
@@ -207,8 +208,12 @@ edsac.gui.start = function() {
         edsac.machine.running = true;
 
     var self = this;
-    this.intervalId = window.setInterval(function() { self.step(); },
-                                         this.DELAY);
+    this.intervalId = window.setInterval(
+        function() {
+            for (var i = 0; (i < self.STEPS_PER_INTERVAL) && self.running; i++)
+                self.step();
+        },
+        this.DELAY);
     this.running = true;
     this.runButton.val('Pause');
 };

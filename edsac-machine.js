@@ -202,7 +202,7 @@ edsac.machine.step = function() {
                           this.get(addr, mode).and(this.getMult(mode))));
         break;
     case 'R':
-    case 'L': {
+    case 'L': { // shift left/right
         // Find rightmost 1-bit
         var i = 0;
         while (orderVal.get(i) == 0)
@@ -210,7 +210,7 @@ edsac.machine.step = function() {
         if (op == 'L')
             this.setAccum(2, this.getAccum(2).shiftLeft(i+1));
         else
-            this.setAccum(2, this.getAccum(2).shiftRight(i+1));
+            this.setAccum(2, this.getAccum(2).shiftArithmeticRight(i+1));
         break;
     }
     case 'E': // if A >= 0 goto N

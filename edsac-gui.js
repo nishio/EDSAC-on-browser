@@ -32,7 +32,11 @@ edsac.gui.init = function(prefix) {
 
     this.updateStatus();
 
-    this.stepButton.click(function() { self.step(); });
+    this.stepButton.click(
+        function() {
+            self.stop();
+            self.step();
+        });
     this.stepButton.attr('disabled', false);
 
     this.runButton.click(
@@ -59,7 +63,7 @@ edsac.gui.init = function(prefix) {
 
     this.loadButton.click(
         function() {
-            var source = self.source.text();
+            var source = self.source.val();
             // Remove whitespace and comments
             source = source.replace(/\s+/g, '');
             source = source.replace(/\[.*?\]/g, '');

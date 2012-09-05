@@ -3,10 +3,11 @@
 
 // figs: #, lets: *, null: ., cr: @, sp: !, lf: &
 // pound sign replaced with L
+// second # replaced with ^ to avoid collision
 
 edsac.N_LETTERS = 32;
 edsac.LETTERS = 'PQWERTYUIOJ#SZK*.F@D!HNM&LXGABCV';
-edsac.FIGURES = '0123456789?#"+(*.$@;!L,.&)/#-?:=';
+edsac.FIGURES = '0123456789?#"+(*.$@;!L,.&)/^-?:=';
 
 edsac.Printer = function() {
     this.lines = [''];
@@ -51,6 +52,10 @@ edsac.Printer.prototype.writeNum = function(num) {
         break;
 
     case '.': // null
+        break;
+
+    case '^': // the # character
+        this.writeChar('#');
         break;
 
     default:

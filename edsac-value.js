@@ -115,16 +115,15 @@ edsac.decimalTable = [edsac.valueFromBinary('00000'),
 edsac.Value.prototype.printDecimal = function(signed) {
     // we'll divide v by 10 until it zeroes out
     var v = this;
-    if (!signed) {
-        // make an unsigned number, bigger by 1 bit
-        v = this.copy(this.n+1);
-        // set its sign bit to 0
-        v.set(this.n, 0);
-    }
 
     var signBit = v.signBit();
-    if (signBit)
+    if (signBit && signed)
         v = v.negate();
+
+    // make an unsigned number, bigger by 1 bit
+    v = v.copy(this.n+1);
+    // set its sign bit to 0
+    v.set(this.n, 0);
 
     var s = '';
 
@@ -143,7 +142,7 @@ edsac.Value.prototype.printDecimal = function(signed) {
     if (s == '')
         s = '0';
 
-    if (signBit)
+    if (signBit && signed)
         s = '-'+s;
 
     return s;

@@ -15,6 +15,7 @@ edsac.gui.init = function(prefix) {
     this.status = $(prefix+'status');
     this.stepButton = $(prefix+'step'); this.stepButton.val('Step');
     this.runButton = $(prefix+'run'); this.runButton.val('Run');
+    this.resetButton = $(prefix+'reset'); this.resetButton.val('Reset');
     this.loadButton = $(prefix+'load'); this.loadButton.val('Load');
     this.input = $(prefix+'input');
     this.output = $(prefix+'output');
@@ -42,6 +43,14 @@ edsac.gui.init = function(prefix) {
         });
     this.runButton.attr('disabled', false);
 
+    this.resetButton.click(
+        function() {
+            self.stop();
+            edsac.machine.reset();
+            edsac.loadInitialOrders(self.ordersVer);
+            self.updateStatus();
+        });
+
     this.input.change(
         function() {
             edsac.machine.setInput(self.input.val());
@@ -61,8 +70,10 @@ edsac.gui.init = function(prefix) {
         function() {
             var newVer = self.ordersVer == 1 ? 2 : 1;
 
+            self.stop();
             edsac.machine.reset();
             edsac.loadInitialOrders(newVer);
+            self.updateStatus();
 
             self.switchButton.val('Switch to Initial Orders '+self.ordersVer);
             self.ordersVer = newVer;

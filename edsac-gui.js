@@ -16,12 +16,15 @@ edsac.gui.init = function(prefix) {
     this.stepButton = $(prefix+'step'); this.stepButton.val('Step');
     this.runButton = $(prefix+'run'); this.runButton.val('Run');
     this.resetButton = $(prefix+'reset'); this.resetButton.val('Reset');
-    this.loadButton = $(prefix+'load'); this.loadButton.val('Load');
+    this.loadButton = $(prefix+'load'); this.loadButton.val('Load source');
     this.input = $(prefix+'input');
     this.output = $(prefix+'output');
+    this.source = $(prefix+'source');
 
     this.switchButton = $(prefix+'switch');
     this.switchButton.val('Switch to Initial Orders 2');
+
+    this.source = $(prefix+'source');
 
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
@@ -58,11 +61,11 @@ edsac.gui.init = function(prefix) {
 
     this.loadButton.click(
         function() {
-            try {
-                edsac.machine.loadInput();
-            } catch (err) {
-                window.alert(err);
-            }
+            var source = self.source.text();
+            // Remove whitespace and comments
+            source = source.replace(/\s+/g, '');
+            source = source.replace(/\[.*?\]/g, '');
+            edsac.machine.setInput(source);
         });
 
     this.ordersVer = 1;
@@ -188,7 +191,7 @@ edsac.gui.start = function() {
         return;
     if (!edsac.machine.running)
         edsac.machine.running = true;
-    
+
     var self = this;
     this.intervalId = window.setInterval(function() { self.step(); },
                                          this.DELAY);

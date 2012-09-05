@@ -10,22 +10,42 @@
   <script src="edsac-gui.js"></script>
   <script src="edsac-test.js"></script>
   <script src="jquery-1.7.2.min.js"></script>
-  <script src="raphael-min.js"></script>
-  <script src="edsac-visualize.js"></script>
+  <script src="jquery-ui.min.js"></script>
+  <link rel="stylesheet" type="text/css"
+        href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/themes/base/jquery-ui.css">
+
+  <!-- <script src="raphael-min.js"></script>
+  <script src="edsac-visualize.js"></script> -->
+
   <script>
     $(function() {
+       $('#tabs').tabs();
        edsac.test();
        edsac.machine.init();
        edsac.loadInitialOrders();
        edsac.gui.init('#edsac-');
        // sample program - print 4 characters and stop
-       edsac.machine.setInput('T123SE84SPSPSP10000SP1000SP100SP10SP1SQS#SA40S!S&S@SO43SO33SPSA46ST65ST129SA35ST34SE61ST48SA47ST65SA33SA40ST33SA48SS34SE55SA34SPST48ST33SA52SA4SU52SS42SG51SA117ST52SPSPSPSPSPSE110SE118SP100SE95SO41ST129SO44SO45SA76SA4SU76ST48SA83ST75SE49SO43SO43SH76SV76SL64SL32SU77SS78ST79SA77SU78ST48SA80ST75SE49SO43SO43SA79ST48SA81ST75SE49SA35SA76SS82SG85SO41SZS');
+       // edsac.machine.setInput('T123SE84SPSPSP10000SP1000SP100SP10SP1SQS#SA40S!S&S@SO43SO33SPSA46ST65ST129SA35ST34SE61ST48SA47ST65SA33SA40ST33SA48SS34SE55SA34SPST48ST33SA52SA4SU52SS42SG51SA117ST52SPSPSPSPSPSE110SE118SP100SE95SO41ST129SO44SO45SA76SA4SU76ST48SA83ST75SE49SO43SO43SH76SV76SL64SL32SU77SS78ST79SA77SU78ST48SA80ST75SE49SO43SO43SA79ST48SA81ST75SE49SA35SA76SS82SG85SO41SZS');
     });
   </script>
   <style>
+    #tabs {
+       font-family: Times, serif;
+       font-size: 1em;
+    }
+    #tabs input {
+       font-size: 0.9em;
+    }
+    #tabs .ui-tabs-panel { padding: 0.2em; }
+    #tabs .ui-tabs-nav li a { padding: 0.2em 0.6em; }
+    #tabs textarea {
+       font-family: monospace;
+       font-size: 12px;
+    }
+
     #edsac-memory {
        float: left;
-       height: 20em;
+       height: 19em;
        margin: 0.5em;
        overflow-y: scroll;
     }
@@ -59,30 +79,86 @@
     }
 
     #edsac-output-wrapper {
-       height: 20em;
+       height: 19em;
        width: 20em;
        padding: 0.5em;
        overflow-y: auto;
        background: #eee;
     }
+
+    #edsac-source {
+      width: 100%;
+      height: 280px;
+    }
   </style>
 </head>
 <body>
-  <div id="edsac-status"></div><br>
-  <input type="button" id="edsac-step" />
-  <input type="button" id="edsac-run" />
-  <input type="button" id="edsac-reset" />
-  <br>
-  Input: <input type="text" id="edsac-input"></input>
-  <input type="button" id="edsac-load" />
-  <br>
-  <input type="button" id="edsac-switch" /><br>
-  <div id="edsac-memory"></div>
-  <div id="edsac-output-wrapper">
-    Output:<br>
-    <br>
-    <pre id="edsac-output"></pre>
-  </div>
-  <div id='accumulator'></div>
+
+  <div id="tabs">
+    <ul>
+      <li><a href="#machine-tab">Machine</a></li>
+      <li><a href="#source-tab">Source</a></li>
+    </ul>
+
+    <div id="machine-tab">
+      <div id="edsac-status"></div>
+      <input type="button" id="edsac-step" />
+      <input type="button" id="edsac-run" />
+      <input type="button" id="edsac-reset" />
+      <br>
+      Input tape: <input type="text" id="edsac-input"></input>
+      <input type="button" id="edsac-load" />
+      <br>
+      <input type="button" id="edsac-switch" /><br>
+      <div id="edsac-memory"></div>
+      <div id="edsac-output-wrapper">
+        Output:<br>
+        <br>
+        <pre id="edsac-output"></pre>
+      </div>
+      <!-- <div id='accumulator'></div> -->
+    </div> <!-- machine-tab -->
+
+    <div id="source-tab">
+      <textarea id="edsac-source">
+[Hello World]
+T64K
+GK
+ZF
+O16@
+O17@
+O18@
+O19@
+O20@
+O21@
+O22@
+O23@
+O24@
+O25@
+O26@
+O27@
+O28@
+O29@
+ZF
+*F
+HF
+EF
+LF
+LF
+OF
+!F
+WF
+OF
+RF
+LF
+DF
+@F
+&F
+EZPF
+      </textarea>
+    </div> <!-- source-tab -->
+
+  </div> <!-- tabs -->
+
 </body>
 </html>

@@ -127,8 +127,8 @@ edsac.gui.updateStatus = function() {
     html += 'ABC: [' + (abc.substr(0,17) + ' ' +
                          abc.substr(17,1) + ' ' +
                         abc.substr(18,17) + ' ' +
-                         abc.substr(35,1) + ' ' +
-                        abc.substr(36,17) + ' ' +
+                         abc.substr(35,1) + ' ' + '<br>' +
+                        '      ' + abc.substr(36,17) + ' ' +
                          abc.substr(53,1) + ' ' +
                         abc.substr(54,17)) + ']<br>';
 

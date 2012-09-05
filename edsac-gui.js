@@ -19,6 +19,9 @@ edsac.gui.init = function(prefix) {
     this.input = $(prefix+'input');
     this.output = $(prefix+'output');
 
+    this.switchButton = $(prefix+'switch');
+    this.switchButton.val('Switch to Initial Orders 2');
+
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
         var item = this.makeMemItem(i);
@@ -52,6 +55,20 @@ edsac.gui.init = function(prefix) {
                 window.alert(err);
             }
         });
+
+    this.ordersVer = 1;
+    this.switchButton.click(
+        function() {
+            var newVer = self.ordersVer == 1 ? 2 : 1;
+
+            edsac.machine.reset();
+            edsac.loadInitialOrders(newVer);
+
+            self.switchButton.val('Switch to Initial Orders '+self.ordersVer);
+            self.ordersVer = newVer;
+        }
+    );
+
     this.active = true;
 };
 

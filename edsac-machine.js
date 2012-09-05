@@ -35,6 +35,15 @@ edsac.machine.init = function() {
     this.running = true;
 };
 
+edsac.machine.reset = function() {
+    this.setIp(0);
+    this.setAccum(2, edsac.zeroValue(71));
+    this.setMult(1, edsac.zeroValue(35));
+    for (var i = 0; i < this.MEM_SIZE; ++i)
+        this.set(2*i, 1, edsac.zeroValue(35));
+    this.running = true;
+};
+
 // Memory getters and setters: w[2n], m[2n or 2n+1]
 // No other method should mutate the values acquired by get
 
@@ -61,7 +70,11 @@ edsac.machine.set = function(addr, wide, value) {
     if (value.n != (wide ? 35 : 17))
         throw 'wrong value width';
 
-    this.get(addr, wide).assign(value);
+    var v = this.get(addr, wide);
+    if (v.compare(value) == 0)
+        return;
+
+    v.assign(value);
 
     if (edsac.gui && edsac.gui.active) {
         edsac.gui.onSet(addr);

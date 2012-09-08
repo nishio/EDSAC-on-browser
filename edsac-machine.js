@@ -14,7 +14,7 @@ edsac.machine.init = function() {
     for (var i = 0; i < this.mem.length; ++i)
         this.mem[i] = edsac.zeroValue(35);
 
-    // Instruction pointer
+    // Instruction pointer (SCR)
     this.ip = 0;
 
     // 71-bit accumulator
@@ -31,7 +31,18 @@ edsac.machine.init = function() {
 
     this.input = '';
     this.output = new edsac.Printer();
+    this.lastOutput = 0;
 
+    this.running = true;
+};
+
+edsac.machine.reset = function() {
+    this.setIp(0);
+    this.setAccum(2, edsac.zeroValue(71));
+    this.setMult(1, edsac.zeroValue(35));
+    for (var i = 0; i < this.MEM_SIZE; ++i)
+        this.set(2*i, 1, edsac.zeroValue(35));
+    this.lastOutput = 0;
     this.running = true;
 };
 
@@ -61,7 +72,11 @@ edsac.machine.set = function(addr, wide, value) {
     if (value.n != (wide ? 35 : 17))
         throw 'wrong value width';
 
-    this.get(addr, wide).assign(value);
+    var v = this.get(addr, wide);
+    if (v.compare(value) == 0)
+        return;
+
+    v.assign(value);
 
     if (edsac.gui && edsac.gui.active) {
         edsac.gui.onSet(addr);
@@ -131,6 +146,7 @@ edsac.machine.readNum = function(s) {
 
 edsac.machine.writeNum = function(num) {
     this.output.writeNum(num);
+    this.lastOutput = num;
     if (edsac.gui && edsac.gui.active)
         edsac.gui.onSetOutput(this.output.getText());
 };
@@ -160,14 +176,20 @@ edsac.machine.step = function() {
         //this.setMult(mode, this.getMult(mode).add(this.get(addr, mode)));
         this.setMult(mode, this.get(addr, mode));
         break;
-    case 'V': // AB/ABC += mem * R/RS
-        this.setAccum(mode+1, this.getAccum(mode+1).add(
-                          this.get(addr, mode).mult(this.getMult(mode)).shiftLeft(2)));
+    case 'V': { // AB/ABC += mem * R/RS
+        var v = this.get(addr, mode).mult(this.getMult(mode));
+        // extend by 1 bit
+        v = v.copy(v.n+1);
+        this.setAccum(mode+1, this.getAccum(mode+1).add(v.shiftLeft(2)));
         break;
-    case 'N': // AB/ABC -= mem * R/RS
-        this.setAccum(mode+1, this.getAccum(mode+1).sub(
-                          this.get(addr, mode).mult(this.getMult(mode)).shiftLeft(2)));
+    }
+    case 'N': { // AB/ABC -= mem * R/RS
+        var v = this.get(addr, mode).mult(this.getMult(mode));
+        // extend by 1 bit
+        v = v.copy(v.n+1);
+        this.setAccum(mode+1, this.getAccum(mode+1).sub(v.shiftLeft(2)));
         break;
+    }
     case 'U': // mem = A/AB
         this.set(addr, mode, this.getAccum(mode));
         break;
@@ -176,11 +198,11 @@ edsac.machine.step = function() {
         this.setAccum(2, edsac.zeroValue(71));
         break;
     case 'C': // A/AB += mem & R/RS
-        this.setAccum(mode+1, this.getAccum(mode+1).add(
+        this.setAccum(mode, this.getAccum(mode).add(
                           this.get(addr, mode).and(this.getMult(mode))));
         break;
     case 'R':
-    case 'L': {
+    case 'L': { // shift left/right
         // Find rightmost 1-bit
         var i = 0;
         while (orderVal.get(i) == 0)
@@ -188,7 +210,7 @@ edsac.machine.step = function() {
         if (op == 'L')
             this.setAccum(2, this.getAccum(2).shiftLeft(i+1));
         else
-            this.setAccum(2, this.getAccum(2).shiftRight(i+1));
+            this.setAccum(2, this.getAccum(2).shiftArithmeticRight(i+1));
         break;
     }
     case 'E': // if A >= 0 goto N
@@ -200,25 +222,39 @@ edsac.machine.step = function() {
             newIp = addr;
         break;
     case 'I': { // read character into 5 lowest bits of m[N]
+                // or 5 middle bits of w[N]
         var num = this.readNum();
-        this.set(addr, 0, edsac.valueFromInteger(num, 17));
+        if (mode == 0)
+            this.set(addr, 0, edsac.valueFromInteger(num, 17));
+        else
+            this.set(addr, 1, edsac.valueFromInteger(num, 35).shiftLeft(18));
         break;
     }
-    case 'O': { // output 5 highest bits of m[N] as character
-        var val = this.get(addr, false).slice(12, 5);
+    case 'O': { // output 5 highest bits of m[N]/w[N] as character
+        var val;
+        if (mode == 0)
+            val = this.get(addr, 0).slice(12, 5);
+        else
+            val = this.get(addr, 1).slice(30, 5);
         this.writeNum(val.toInteger(false));
         break;
     }
-    case 'F':
-        throw 'unimplemented opcode: ' + op;
+    case 'F': { // load last output to memory
+        var val;
+        if (mode == 0)
+            val = edsac.valueFromInteger(this.lastOutput, 17).shiftLeft(12);
+        else
+            val = edsac.valueFromInteger(this.lastOutput, 35).shiftLeft(30);
+        this.set(addr, mode, val);
+        break;
+    }
     case 'X': // no operation
         break;
     case 'Y': // ABC += {1 at bit 35} (34 counting from the left)
         this.setAccum(2, this.getAccum(2).add(this.BIT_35));
         break;
-    case 'Z':
+    case 'Z': // stop
         this.running = false;
-        newIp -= 1; // stay on the same IP
         break;
     default:
         throw 'malformed order: '+orderVal.printOrder();

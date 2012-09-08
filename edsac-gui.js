@@ -5,42 +5,61 @@ edsac.gui = {};
 
 edsac.gui.active = false;
 edsac.gui.running = false;
-edsac.gui.DELAY = 50; // delay between steps in milliseconds
+edsac.gui.DELAY = 50;
+edsac.gui.STEPS_PER_INTERVAL = 5;
 
-// Initialize the interface. The arguments are jQuery elements.
-edsac.gui.init = function(memory, status,
-                          stepButton, runButton,
-                          input, output,
-                          loadButton) {
+// Initialize the interface. 'prefix' is a prefix for jQuery selector.
+edsac.gui.init = function(prefix) {
+    this.ordersVer = 2;
+    edsac.machine.init();
+    edsac.loadInitialOrders(this.ordersVer);
+
     var self = this;
 
-    this.memory = memory;
-    this.status = status;
-    this.stepButton = stepButton;
-    this.runButton = runButton;
-    this.loadButton = loadButton;
-    this.input = input;
-    this.output = output;
+    this.memory = $(prefix+'memory');
+    this.status = $(prefix+'status');
+    this.stepButton = $(prefix+'step'); this.stepButton.val('Step');
+    this.runButton = $(prefix+'run'); this.runButton.val('Run');
+    this.resetButton = $(prefix+'reset'); this.resetButton.val('Reset');
+    this.loadButton = $(prefix+'load'); this.loadButton.val('Load source');
+    this.input = $(prefix+'input'); this.input.val('');
+    this.output = $(prefix+'output');
+    this.source = $(prefix+'source');
+
+    this.switchButton = $(prefix+'switch');
+    this.switchButton.val('Switch to Initial Orders '+(3-this.ordersVer));
 
     // For now, only show memory in 'narrow' mode
     for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
         var item = this.makeMemItem(i);
-        memory.append(item);
+        this.memory.append(item);
     }
 
     this.updateStatus();
 
-    this.stepButton.click(function() { self.step(); });
+    this.stepButton.click(
+        function() {
+            self.pause();
+            self.step();
+        });
     this.stepButton.attr('disabled', false);
 
     this.runButton.click(
         function() {
             if (self.running)
-                self.stop();
+                self.pause();
             else
                 self.start();
         });
     this.runButton.attr('disabled', false);
+
+    this.resetButton.click(
+        function() {
+            self.pause();
+            edsac.machine.reset();
+            edsac.loadInitialOrders(self.ordersVer);
+            self.updateStatus();
+        });
 
     this.input.change(
         function() {
@@ -49,13 +68,29 @@ edsac.gui.init = function(memory, status,
 
     this.loadButton.click(
         function() {
-            try {
-                edsac.machine.loadInput();
-            } catch (err) {
-                window.alert(err);
-            }
+            var source = self.source.val();
+            // Remove whitespace and comments
+            source = source.replace(/\s+/g, '');
+            source = source.replace(/\[.*?\]/g, '');
+            edsac.machine.setInput(source);
         });
+
+    this.switchButton.click(
+        function() {
+            var newVer = 3-self.ordersVer;
+
+            self.pause();
+            edsac.machine.reset();
+            edsac.loadInitialOrders(newVer);
+            self.updateStatus();
+
+            self.switchButton.val('Switch to Initial Orders '+self.ordersVer);
+            self.ordersVer = newVer;
+        }
+    );
+
     this.active = true;
+    edsac.vis.init(prefix);
 };
 
 edsac.formatInt = function(n, width) {
@@ -92,7 +127,7 @@ edsac.gui.makeMemItem = function(addr) {
 
 edsac.gui.updateStatus = function() {
     var html = '';
-    html += 'IP = ' + edsac.formatInt(edsac.machine.ip, 4) +
+    html += 'SCR = ' + edsac.formatInt(edsac.machine.ip, 4) +
         (edsac.machine.running ? '' : ' (stopped)') + '<br>';
     html += '<br>';
 
@@ -100,8 +135,8 @@ edsac.gui.updateStatus = function() {
     html += 'ABC: [' + (abc.substr(0,17) + ' ' +
                          abc.substr(17,1) + ' ' +
                         abc.substr(18,17) + ' ' +
-                         abc.substr(35,1) + ' ' +
-                        abc.substr(36,17) + ' ' +
+                         abc.substr(35,1) + ' ' + '<br>' +
+                        '      ' + abc.substr(36,17) + ' ' +
                          abc.substr(53,1) + ' ' +
                         abc.substr(54,17)) + ']<br>';
 
@@ -126,8 +161,16 @@ edsac.gui.updateMemory = function(addr) {
     elt.replaceWith(this.makeMemItem(addr));
 };
 
+edsac.gui.scrollToMemory = function(addr) {
+    var elt = this.memory.find('.mem-item.'+addr);
+    var elt0 = this.memory.find('.mem-item.'+0);
+    var offset = elt.offset().top - elt0.offset().top;
+    this.memory.scrollTop(offset);
+};
+
 edsac.gui.onSet = function(addr) {
     this.updateMemory(addr);
+    edsac.vis.onSet(addr);
 };
 
 edsac.gui.onSetInput = function(s) {
@@ -135,7 +178,7 @@ edsac.gui.onSetInput = function(s) {
 };
 
 edsac.gui.onSetOutput = function(s) {
-    this.output.text(s);
+    this.output.text(s+'_');
 };
 
 edsac.gui.onSetIp = function(oldIp, newIp) {
@@ -145,36 +188,37 @@ edsac.gui.onSetIp = function(oldIp, newIp) {
 
 edsac.gui.step = function() {
     if (!edsac.machine.running)
-        return;
+        edsac.machine.running = true;
 
     try {
         edsac.machine.step();
     } catch (err) {
         window.alert(err);
-        this.stop();
+        this.pause();
     }
     this.updateStatus();
-    if (!edsac.machine.running) {
-        this.stepButton.attr('disabled', true);
-        this.runButton.attr('disabled', true);
-        this.loadButton.attr('disabled', true);
-        this.stop();
-    }
+    if (!edsac.machine.running)
+        this.pause();
 };
 
 edsac.gui.start = function() {
-    if (!edsac.machine.running)
-        return;
     if (this.running)
         return;
+    if (!edsac.machine.running)
+        edsac.machine.running = true;
+
     var self = this;
-    this.intervalId = window.setInterval(function() { self.step(); },
-                                         this.DELAY);
+    this.intervalId = window.setInterval(
+        function() {
+            for (var i = 0; (i < self.STEPS_PER_INTERVAL) && self.running; i++)
+                self.step();
+        },
+        this.DELAY);
     this.running = true;
-    this.runButton.val('Stop');
+    this.runButton.val('Pause');
 };
 
-edsac.gui.stop = function() {
+edsac.gui.pause = function() {
     if (!this.running)
         return;
     window.clearInterval(this.intervalId);

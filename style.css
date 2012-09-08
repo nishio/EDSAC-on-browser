@@ -1,0 +1,76 @@
+#memory-container {
+    width: 40px;
+    vertical-align: top;
+}
+
+#tabs-container {
+    vertical-align: top;
+}
+
+#edsac-memory-canvas {
+    margin: 0.5em;
+}
+
+#tabs {
+    font-family: Times, serif;
+    font-size: 1em;
+}
+
+#tabs input {
+    font-size: 0.9em;
+}
+#tabs .ui-tabs-panel { padding: 0.2em; }
+#tabs .ui-tabs-nav li a { padding: 0.2em 0.6em; }
+#tabs textarea {
+    font-family: monospace;
+    font-size: 12px;
+}
+
+#edsac-memory {
+    height: 19em;
+    margin: 0.5em;
+    overflow-y: scroll;
+}
+
+#edsac-status {
+    width: 37em;
+    margin: 0em;
+    overflow-x: auto;
+}
+
+.mem-item {
+    font-family: monospace;
+    width: 36em;
+    margin-right: 1em;
+}
+
+.mem-item.odd {
+    background: #ddd;
+}
+
+.mem-item.current {
+    background: #222;
+    color: #eee;
+}
+
+.mem-item .descr {
+    color: #777;
+    float: right;
+}
+
+.mem-item.current .descr{
+    color: #bbb;
+}
+
+#output-container {
+    height: 19em;
+    width: 20em;
+    padding: 0.5em;
+    overflow-y: auto;
+    background: #eee;
+}
+
+#edsac-source {
+    width: 100%;
+    height: 280px;
+}

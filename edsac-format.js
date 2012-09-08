@@ -3,10 +3,11 @@
 
 // figs: #, lets: *, null: ., cr: @, sp: !, lf: &
 // pound sign replaced with L
+// second # replaced with ^ to avoid collision
 
 edsac.N_LETTERS = 32;
 edsac.LETTERS = 'PQWERTYUIOJ#SZK*.F@D!HNM&LXGABCV';
-edsac.FIGURES = '0123456789?#"+(*.$@;!L,.&)/#-?:=';
+edsac.FIGURES = '0123456789?#"+(*.$@;!L,.&)/^-?:=';
 
 edsac.Printer = function() {
     this.lines = [''];
@@ -32,7 +33,10 @@ edsac.Printer.prototype.writeNum = function(num) {
 
     switch(c) {
     case '#': // figs
-        this.figShift = !this.figShift;
+        this.figShift = true;
+        break;
+    case '*': // lets
+        this.figShift = false;
         break;
 
     // CR/LF are not fully supported because we don't allow overprinting.
@@ -45,6 +49,13 @@ edsac.Printer.prototype.writeNum = function(num) {
 
     case '!': // sp
         this.writeChar(' ');
+        break;
+
+    case '.': // null
+        break;
+
+    case '^': // the # character
+        this.writeChar('#');
         break;
 
     default:
@@ -162,9 +173,9 @@ edsac.Value.prototype.describeOrder = function() {
             return 'm['+addr+'] = A';
     case 'C':
         if (mode)
-            return 'ABC += w['+addr+'] & RS';
+            return 'AB += w['+addr+'] & RS';
         else
-            return 'AB += m['+addr+'] & R';
+            return 'A += m['+addr+'] & R';
     case 'R':
     case 'L': {
         var i = 0;
@@ -180,11 +191,20 @@ edsac.Value.prototype.describeOrder = function() {
     case 'G':
         return 'if A < 0 goto '+addr;
     case 'I':
-        return 'm['+addr+'] = read()';
+        if (mode)
+            return 'w['+addr+'] = read()';
+        else
+            return 'm['+addr+'] = read()';
     case 'O':
-        return 'write(m['+addr+'])';
+        if (mode)
+            return 'write(w['+addr+'])';
+        else
+            return 'write(m['+addr+'])';
     case 'F':
-        return 'verify';
+        if (mode)
+            return 'w['+addr+'] = last';
+        else
+            return 'm['+addr+'] = last';
     case 'Y':
         return 'round ABC';
     case 'Z':

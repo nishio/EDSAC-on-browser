@@ -80,4 +80,6 @@ Reference
 Thanks
 ======
 
-Artem Smirnov, Mustafa Karimi, Yoni Tresina Purbasari, Dariane Joy Papa
+Special thanks to Paweł Marczewski, he made a massive contribution to the project.
+
+Thanks to Artem Smirnov, Mustafa Karimi, Yoni Tresina Purbasari and Dariane Joy Papa.

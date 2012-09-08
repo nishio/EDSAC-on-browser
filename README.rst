@@ -61,10 +61,24 @@ Reference
 - http://www.cl.cam.ac.uk/~mr/edsacposter.pdf
 
   - code of initial order and square are come from this poster.
-  - "11100 0 0000100010 0 62 S34S" seems typo of "01100 ..."
-  - It said HnS is 'R += m[n]', however EdsacTG.pdf said it is 'R = m[n]'.
-    If '+=' is correct, on '97: H76S', result is affected by value which stored on R during initial order.
-    I choose 'R = m[n]'.
+  - unfortunately, the poster is very unclear at times and contains many errors:
+
+   - "11100 0 0000100010 0 62 S34S" seems typo of "01100 ..."
+   - It says HnS is 'R += m[n]', however the correct semantics is 'R =
+     m[n]', as confirmed by the example programs.
+   - The 'verify' order (actually, load last output to memory) is not
+     explained.
+   - The wording of 'load input into the 5 least significant bits' is unclear, the
+     order wipes all other bits.
+   - The input/output/verify orders have a long mode variant, not
+     mentioned in the poster.
+   - The 'and' order is not "ABC += w & RS", but 'AB += w & RS'.
+   - It's not explained that the 'multiply' order shifts the result
+     left by 2 bits.
+
+- http://www.cl.cam.ac.uk/conference/EDSAC99/simulators/india/download.html
+
+  - Java emulator, with easy to read source code
 
 - http://www.cl.cam.ac.uk/users/mr/Edsac/edsac.tgz
 

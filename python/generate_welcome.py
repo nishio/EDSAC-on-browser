@@ -19,11 +19,11 @@ GK
 
 for i, c in enumerate(MSG):
     print "O%d@" % (len(MSG) + 2 + i)
+print
 
 print "ZF"
 print "*F"
 for i, c in enumerate(MSG):
     print "%sF" % c
 
-print "&F"
 print "EZPF"

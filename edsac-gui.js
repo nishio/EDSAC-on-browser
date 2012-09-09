@@ -5,7 +5,7 @@ edsac.gui = {};
 
 edsac.gui.active = false;
 edsac.gui.running = false;
-edsac.gui.DELAY = 50;
+edsac.gui.DELAY = 0;
 edsac.gui.STEPS_PER_INTERVAL = 5;
 
 // Initialize the interface. 'prefix' is a prefix for jQuery selector.

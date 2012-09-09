@@ -1,0 +1,8 @@
+Welcome
+
+Program to print welcome message and copyright.
+
+It prints as below:
+
+WELCOME TO EDSAC ON BROWSER
+COPYRIGHT (C) 2012 NISHIO HIROKAZU

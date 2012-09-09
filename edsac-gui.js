@@ -26,6 +26,13 @@ edsac.gui.init = function(prefix) {
     this.output = $(prefix+'output');
     this.source = $(prefix+'source');
 
+    // TODO: make better way to choose samples
+    var load_wada_sieve = $(prefix+'load_wada_sieve'); load_wada_sieve.val('Load Wada Sieve');
+    load_wada_sieve.click(function(){
+        $("#edsac-source").val('[Sieve of Eratosthenes by Eiiti Wada]\n..PZ\n[M3]\nPFGKIFAFRDLFUFOFE@A6FG@E8FEZPF\n@&*SIEVE!OF!ERATOSTHENES\n@&*BY!EIITI!WADA#N!*APRIL!#1N!2001\n@&@&*WATCH!THE !SIEVE!IN!LONGTANK!#31@&@&\n..PZ\nT56K\n[P6]\nGKA3FT25@H29@VFT4DA3@TFH30@S6@T1F\nV4DU4DAFG26@TFTFO5FA4DF4FS4F\nL4FT4DA1FS3@G9@EFSFO31@E20@J995FJF!F\n\nT834K\n&F\n@F\n#F\nC1024D\nH992D\nP4F\nH922D\nP6F\nP70F\nLF\nPD\nPF\nU992D\nW70F\nT1024D\nP2F\nPD\nPF\n\nT96K\nGK\nTF\nS850D\nT992D\nA2@\nA849F\nU2@\nS848F\nG@\nTF\nA1022D\nS850D\nT852D\nA850D\nU922D\nLD\nT850D\nA11@\nA849F\nU11@\nA847F\nU13@\nS846F\nG8@\nO836F\nO835F\nO834F\nTF\nA849F\nRD\nTF\nA30@\nG56F\nTF\nH922D\nC992D\nS844D\nG75@\nO836F\nO835F\nO834F\nTF\nA841F\nR1F\nTF\nA44@\nG56F\nTF\nA34@\nU71@\nS843F\nT72@\nA33@\nS842F\nA841F\nU70@\nS840F\nG69@\nTF\nA71@\nA849F\nU71@\nS843F\nU72@\nS848F\nE75@\nTF\nA70@\nS842F\nG54@\nTF\nHD\nCD\nTD\nA70@\nG53@\nTF\nA841F\nA839F\nT841F\nA33@\nA849F\nU33@\nS838F\nG32@\nA840F\nT33@\nA34@\nA849F\nU34@\nS837F\nG32@\nZF\nE96K\nPF\n\n');
+    });
+    // end TODO
+
     this.switchButton = $(prefix+'switch');
     this.switchButton.val('Switch to Initial Orders '+(3-this.ordersVer));
 

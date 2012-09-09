@@ -61,7 +61,7 @@ Reference
 - http://www.cl.cam.ac.uk/~mr/edsacposter.pdf
 
   - code of initial order and square are come from this poster.
-  - unfortunately, the poster is very unclear at times and contains many errors:
+  - unfortunately, the poster contains some errors:
 
    - "11100 0 0000100010 0 62 S34S" seems typo of "01100 ..."
    - It says HnS is 'R += m[n]', however the correct semantics is 'R =

@@ -2,16 +2,9 @@
  EDSAC Simulator on browser
 ============================
 
-I think EDSAC is good to learn machine language,
-because recent CPU is complex.
-
-My goal is to make a Python version to run on console,
-and a JavaScript version to run on browser.
-
-**NOTICE**
-
-This code is not complete yet.
-
+I think EDSAC is good to learn machine language, because recent CPU is complex.
+The 'initial order' of EDSAC reads human readable commands from punchtape and store machine readable instructions into its memory.
+It is very primitive programming language.
 
 Design
 ======
@@ -21,38 +14,11 @@ For easy learning and inspectation,
 use memories in human-readable way.
 
 
-Usage
-=====
-
-Now we have a Python version. No JS version yet.
-
-$ python edsac.py
-
-will show square numbers and its difference. See edsacposter.pdf
-
-
-TODO
-====
-
-- Try other sample to run (next target is WadaSieve)
-
-  - ignore space and newline
-  - Need visualization of memory pattern. (use canvas?)
-
-    - easy method: print on console
-
-- I made 3 classes Value, WordValue, DoubleWordValue,
-  however I feel it is better to use only one class 'Bits'
-
-- JS version
-
-  - select sample code from a listbox: like http://jsx.github.com/try-on-web/
-  - step execution
-
 License
 =======
 
-GPLv3 by NISHIO Hirokazu (c)2012
+GPLv3.
+Copyright (C) 2012 NISHIO Hirokazu
 
 
 Reference

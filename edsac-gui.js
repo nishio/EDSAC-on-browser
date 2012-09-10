@@ -63,6 +63,7 @@ edsac.gui.init = function(prefix) {
     this.resetButton.click(
         function() {
             self.pause();
+            edsac.gui.onSetOutput(''); // clear output
             edsac.machine.reset();
             edsac.loadInitialOrders(self.ordersVer);
             self.updateStatus();

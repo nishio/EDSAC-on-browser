@@ -6,6 +6,11 @@ I think EDSAC is good to learn machine language, because recent CPU is complex.
 The 'initial order' of EDSAC reads human readable commands from punchtape and store machine readable instructions into its memory.
 It is very primitive programming language.
 
+Demo
+====
+
+Visit Here: `EDSAC on browser <repos/EDSAC-on-browser/index.html>`_
+
 Design
 ======
 

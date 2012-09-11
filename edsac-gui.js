@@ -16,28 +16,28 @@ edsac.gui.init = function(prefix) {
 
     var self = this;
 
-    this.memory = $(prefix+'memory');
-    this.status = $(prefix+'status');
-    this.stepButton = $(prefix+'step'); this.stepButton.val('Step');
-    this.runButton = $(prefix+'run'); this.runButton.val('Run');
-    this.resetButton = $(prefix+'reset'); this.resetButton.val('Reset');
-    this.loadButton = $(prefix+'load'); this.loadButton.val('Load source');
-    this.input = $(prefix+'input'); this.input.val('');
-    this.output = $(prefix+'output');
-    this.source = $(prefix+'source');
+    this.memory = $(prefix + 'memory');
+    this.status = $(prefix + 'status');
+    this.stepButton = $(prefix + 'step'); this.stepButton.val('Step');
+    this.runButton = $(prefix + 'run'); this.runButton.val('Run');
+    this.resetButton = $(prefix + 'reset'); this.resetButton.val('Reset');
+    this.loadButton = $(prefix + 'load'); this.loadButton.val('Load source');
+    this.input = $(prefix + 'input'); this.input.val('');
+    this.output = $(prefix + 'output');
+    this.source = $(prefix + 'source');
 
     // TODO: make better way to choose samples
-    var load_wada_sieve = $(prefix+'load_wada_sieve'); load_wada_sieve.val('Load Wada Sieve');
-    load_wada_sieve.click(function(){
-        $("#edsac-source").val('[Sieve of Eratosthenes by Eiiti Wada]\n..PZ\n[M3]\nPFGKIFAFRDLFUFOFE@A6FG@E8FEZPF\n@&*SIEVE!OF!ERATOSTHENES\n@&*BY!EIITI!WADA#N!*APRIL!#1N!2001\n@&@&*WATCH!THE !SIEVE!IN!LONGTANK!#31@&@&\n..PZ\nT56K\n[P6]\nGKA3FT25@H29@VFT4DA3@TFH30@S6@T1F\nV4DU4DAFG26@TFTFO5FA4DF4FS4F\nL4FT4DA1FS3@G9@EFSFO31@E20@J995FJF!F\n\nT834K\n&F\n@F\n#F\nC1024D\nH992D\nP4F\nH922D\nP6F\nP70F\nLF\nPD\nPF\nU992D\nW70F\nT1024D\nP2F\nPD\nPF\n\nT96K\nGK\nTF\nS850D\nT992D\nA2@\nA849F\nU2@\nS848F\nG@\nTF\nA1022D\nS850D\nT852D\nA850D\nU922D\nLD\nT850D\nA11@\nA849F\nU11@\nA847F\nU13@\nS846F\nG8@\nO836F\nO835F\nO834F\nTF\nA849F\nRD\nTF\nA30@\nG56F\nTF\nH922D\nC992D\nS844D\nG75@\nO836F\nO835F\nO834F\nTF\nA841F\nR1F\nTF\nA44@\nG56F\nTF\nA34@\nU71@\nS843F\nT72@\nA33@\nS842F\nA841F\nU70@\nS840F\nG69@\nTF\nA71@\nA849F\nU71@\nS843F\nU72@\nS848F\nE75@\nTF\nA70@\nS842F\nG54@\nTF\nHD\nCD\nTD\nA70@\nG53@\nTF\nA841F\nA839F\nT841F\nA33@\nA849F\nU33@\nS838F\nG32@\nA840F\nT33@\nA34@\nA849F\nU34@\nS837F\nG32@\nZF\nE96K\nPF\n\n');
+    var load_wada_sieve = $(prefix + 'load_wada_sieve'); load_wada_sieve.val('Load Wada Sieve');
+    load_wada_sieve.click(function() {
+        $('#edsac-source').val('[Sieve of Eratosthenes by Eiiti Wada]\n..PZ\n[M3]\nPFGKIFAFRDLFUFOFE@A6FG@E8FEZPF\n@&*SIEVE!OF!ERATOSTHENES\n@&*BY!EIITI!WADA#N!*APRIL!#1N!2001\n@&@&*WATCH!THE !SIEVE!IN!LONGTANK!#31@&@&\n..PZ\nT56K\n[P6]\nGKA3FT25@H29@VFT4DA3@TFH30@S6@T1F\nV4DU4DAFG26@TFTFO5FA4DF4FS4F\nL4FT4DA1FS3@G9@EFSFO31@E20@J995FJF!F\n\nT834K\n&F\n@F\n#F\nC1024D\nH992D\nP4F\nH922D\nP6F\nP70F\nLF\nPD\nPF\nU992D\nW70F\nT1024D\nP2F\nPD\nPF\n\nT96K\nGK\nTF\nS850D\nT992D\nA2@\nA849F\nU2@\nS848F\nG@\nTF\nA1022D\nS850D\nT852D\nA850D\nU922D\nLD\nT850D\nA11@\nA849F\nU11@\nA847F\nU13@\nS846F\nG8@\nO836F\nO835F\nO834F\nTF\nA849F\nRD\nTF\nA30@\nG56F\nTF\nH922D\nC992D\nS844D\nG75@\nO836F\nO835F\nO834F\nTF\nA841F\nR1F\nTF\nA44@\nG56F\nTF\nA34@\nU71@\nS843F\nT72@\nA33@\nS842F\nA841F\nU70@\nS840F\nG69@\nTF\nA71@\nA849F\nU71@\nS843F\nU72@\nS848F\nE75@\nTF\nA70@\nS842F\nG54@\nTF\nHD\nCD\nTD\nA70@\nG53@\nTF\nA841F\nA839F\nT841F\nA33@\nA849F\nU33@\nS838F\nG32@\nA840F\nT33@\nA34@\nA849F\nU34@\nS837F\nG32@\nZF\nE96K\nPF\n\n');
     });
     // end TODO
 
-    this.switchButton = $(prefix+'switch');
-    this.switchButton.val('Switch to Initial Orders '+(3-this.ordersVer));
+    this.switchButton = $(prefix + 'switch');
+    this.switchButton.val('Switch to Initial Orders ' + (3 - this.ordersVer));
 
     // For now, only show memory in 'narrow' mode
-    for (var i = 0; i < 2*edsac.machine.MEM_SIZE; ++i) {
+    for (var i = 0; i < 2 * edsac.machine.MEM_SIZE; ++i) {
         var item = this.makeMemItem(i);
         this.memory.append(item);
     }
@@ -85,14 +85,14 @@ edsac.gui.init = function(prefix) {
 
     this.switchButton.click(
         function() {
-            var newVer = 3-self.ordersVer;
+            var newVer = 3 - self.ordersVer;
 
             self.pause();
             edsac.machine.reset();
             edsac.loadInitialOrders(newVer);
             self.updateStatus();
 
-            self.switchButton.val('Switch to Initial Orders '+self.ordersVer);
+            self.switchButton.val('Switch to Initial Orders ' + self.ordersVer);
             self.ordersVer = newVer;
         }
     );
@@ -118,7 +118,7 @@ edsac.gui.makeMemItem = function(addr) {
     var val = edsac.machine.get(addr, false);
     var code = (this.MEM_TEMPLATE
                 .replace('%addr%', String(addr))
-                .replace('%addr0%', edsac.formatInt(addr,4))
+                .replace('%addr0%', edsac.formatInt(addr, 4))
                 .replace('%bytes%', val.printOrderBinary())
                 .replace('%order%', val.printOrder())
                 .replace('%descr%', val.describeOrder()));
@@ -140,13 +140,13 @@ edsac.gui.updateStatus = function() {
     html += '<br>';
 
     var abc = edsac.machine.getAccum(2).printBinary();
-    html += 'ABC: [' + (abc.substr(0,17) + ' ' +
-                         abc.substr(17,1) + ' ' +
-                        abc.substr(18,17) + ' ' +
-                         abc.substr(35,1) + ' ' + '<br>' +
-                        '      ' + abc.substr(36,17) + ' ' +
-                         abc.substr(53,1) + ' ' +
-                        abc.substr(54,17)) + ']<br>';
+    html += 'ABC: [' + (abc.substr(0, 17) + ' ' +
+                         abc.substr(17, 1) + ' ' +
+                        abc.substr(18, 17) + ' ' +
+                         abc.substr(35, 1) + ' ' + '<br>' +
+                        '      ' + abc.substr(36, 17) + ' ' +
+                         abc.substr(53, 1) + ' ' +
+                        abc.substr(54, 17)) + ']<br>';
 
     html += ('ABC = ' + edsac.machine.getAccum(2).printDecimal(true) +
              ', AB = ' + edsac.machine.getAccum(1).printDecimal(true) +
@@ -154,9 +154,9 @@ edsac.gui.updateStatus = function() {
     html += '<br>';
 
     var rs = edsac.machine.getMult(1).printBinary();
-    html += 'RS: &nbsp;[' + (rs.substr(0,17) + ' ' +
-                              rs.substr(17,1) + ' ' +
-                             rs.substr(18,17)) + ']<br>';
+    html += 'RS: &nbsp;[' + (rs.substr(0, 17) + ' ' +
+                              rs.substr(17, 1) + ' ' +
+                             rs.substr(18, 17)) + ']<br>';
 
     html += ('RS = ' + edsac.machine.getMult(1).printDecimal(true) +
              ', R = ' + edsac.machine.getMult(0).printDecimal(true)) + '<br>';
@@ -165,13 +165,13 @@ edsac.gui.updateStatus = function() {
 };
 
 edsac.gui.updateMemory = function(addr) {
-    var elt = this.memory.find('.mem-item.'+addr);
+    var elt = this.memory.find('.mem-item.' + addr);
     elt.replaceWith(this.makeMemItem(addr));
 };
 
 edsac.gui.scrollToMemory = function(addr) {
-    var elt = this.memory.find('.mem-item.'+addr);
-    var elt0 = this.memory.find('.mem-item.'+0);
+    var elt = this.memory.find('.mem-item.' + addr);
+    var elt0 = this.memory.find('.mem-item.' + 0);
     var offset = elt.offset().top - elt0.offset().top;
     this.memory.scrollTop(offset);
 };
@@ -186,7 +186,7 @@ edsac.gui.onSetInput = function(s) {
 };
 
 edsac.gui.onSetOutput = function(s) {
-    this.output.text(s+'_');
+    this.output.text(s + '_');
 };
 
 edsac.gui.onSetIp = function(oldIp, newIp) {

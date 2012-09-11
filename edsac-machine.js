@@ -41,7 +41,7 @@ edsac.machine.reset = function() {
     this.setAccum(2, edsac.zeroValue(71));
     this.setMult(1, edsac.zeroValue(35));
     for (var i = 0; i < this.MEM_SIZE; ++i)
-        this.set(2*i, 1, edsac.zeroValue(35));
+        this.set(2 * i, 1, edsac.zeroValue(35));
     this.lastOutput = 0;
     this.running = true;
 };
@@ -53,11 +53,11 @@ edsac.machine.get = function(addr, wide) {
     if (Math.round(addr) != addr ||
         (wide && (addr % 2 != 0)) ||
         addr < 0 ||
-        addr >= 2*this.MEM_SIZE)
+        addr >= 2 * this.MEM_SIZE)
 
         throw 'wrong memory address';
 
-    var word = this.mem[(addr - addr % 2)/2];
+    var word = this.mem[(addr - addr % 2) / 2];
     if (wide)
         return word;
     else {
@@ -81,7 +81,7 @@ edsac.machine.set = function(addr, wide, value) {
     if (edsac.gui && edsac.gui.active) {
         edsac.gui.onSet(addr);
         if (wide)
-            edsac.gui.onSet(addr+1);
+            edsac.gui.onSet(addr + 1);
     }
 };
 
@@ -179,15 +179,15 @@ edsac.machine.step = function() {
     case 'V': { // AB/ABC += mem * R/RS
         var v = this.get(addr, mode).mult(this.getMult(mode));
         // extend by 1 bit
-        v = v.copy(v.n+1);
-        this.setAccum(mode+1, this.getAccum(mode+1).add(v.shiftLeft(2)));
+        v = v.copy(v.n + 1);
+        this.setAccum(mode + 1, this.getAccum(mode + 1).add(v.shiftLeft(2)));
         break;
     }
     case 'N': { // AB/ABC -= mem * R/RS
         var v = this.get(addr, mode).mult(this.getMult(mode));
         // extend by 1 bit
-        v = v.copy(v.n+1);
-        this.setAccum(mode+1, this.getAccum(mode+1).sub(v.shiftLeft(2)));
+        v = v.copy(v.n + 1);
+        this.setAccum(mode + 1, this.getAccum(mode + 1).sub(v.shiftLeft(2)));
         break;
     }
     case 'U': // mem = A/AB
@@ -208,9 +208,9 @@ edsac.machine.step = function() {
         while (orderVal.get(i) == 0)
             i++;
         if (op == 'L')
-            this.setAccum(2, this.getAccum(2).shiftLeft(i+1));
+            this.setAccum(2, this.getAccum(2).shiftLeft(i + 1));
         else
-            this.setAccum(2, this.getAccum(2).shiftArithmeticRight(i+1));
+            this.setAccum(2, this.getAccum(2).shiftArithmeticRight(i + 1));
         break;
     }
     case 'E': // if A >= 0 goto N
@@ -257,7 +257,7 @@ edsac.machine.step = function() {
         this.running = false;
         break;
     default:
-        throw 'malformed order: '+orderVal.printOrder();
+        throw 'malformed order: ' + orderVal.printOrder();
     }
 
     this.setIp(newIp);

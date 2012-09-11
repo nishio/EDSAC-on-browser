@@ -37,15 +37,15 @@ edsac.Value.prototype.get = function(i) {
     // Outside of the array, we replicate the oldest (sign) bit
     if (i >= this.n)
         return this.signBit();
-    return this.bits[this.start+i];
+    return this.bits[this.start + i];
 };
 
 edsac.Value.prototype.set = function(i, b) {
-    this.bits[this.start+i] = b;
+    this.bits[this.start + i] = b;
 };
 
 edsac.Value.prototype.signBit = function() {
-    return this.bits[this.start+this.n-1];
+    return this.bits[this.start + this.n - 1];
 };
 
 edsac.Value.prototype.isZero = function() {
@@ -68,7 +68,7 @@ edsac.Value.prototype.compare = function(v) {
 
     // Now compare the remaining bits. The result
     // will depend on the sign bit
-    for (var i = this.n-1; i >= 0; i--) {
+    for (var i = this.n - 1; i >= 0; i--) {
         var b1 = this.get(i);
         var b2 = v.get(i);
 
@@ -85,7 +85,7 @@ edsac.Value.prototype.compare = function(v) {
 edsac.Value.prototype.printBinary = function() {
     var s = '';
     for (var i = 0; i < this.n; i++)
-        s += this.get(this.n-i-1);
+        s += this.get(this.n - i - 1);
 
     return s;
 };
@@ -94,7 +94,7 @@ edsac.valueFromBinary = function(s) {
     var n = s.length;
     var bits = new Array(n);
     for (var i = 0; i < n; i++)
-        bits[n-i-1] = (s.charAt(i) == '0' ? 0 : 1);
+        bits[n - i - 1] = (s.charAt(i) == '0' ? 0 : 1);
     return new edsac.Value(bits);
 };
 
@@ -121,7 +121,7 @@ edsac.Value.prototype.printDecimal = function(signed) {
         v = v.negate();
 
     // make an unsigned number, bigger by 1 bit
-    v = v.copy(this.n+1);
+    v = v.copy(this.n + 1);
     // set its sign bit to 0
     v.set(this.n, 0);
 
@@ -133,9 +133,9 @@ edsac.Value.prototype.printDecimal = function(signed) {
         // the remainder is the digit we need to print
         var r = qr[1];
         // convert from bits to a number
-        var d = r.get(0) + 2*r.get(1) + 4*r.get(2) + 8*r.get(3);
+        var d = r.get(0) + 2 * r.get(1) + 4 * r.get(2) + 8 * r.get(3);
 
-        s = String(d)+s;
+        s = String(d) + s;
         // continue with the quotient
         v = qr[0];
     }
@@ -143,7 +143,7 @@ edsac.Value.prototype.printDecimal = function(signed) {
         s = '0';
 
     if (signBit && signed)
-        s = '-'+s;
+        s = '-' + s;
 
     return s;
 };
@@ -184,7 +184,7 @@ edsac.valueFromInteger = function(m, n) {
 
     var result = edsac.zeroValue(n);
     for (var i = 0; i < n; i++)
-        if (m & (1<<i))
+        if (m & (1 << i))
             result.set(i, 1);
 
     if (signBit)
@@ -200,10 +200,10 @@ edsac.Value.prototype.toInteger = function(signed) {
 
     var m = 0;
     for (var i = 0; i < this.n; i++)
-        m += this.get(i)*(1<<i);
+        m += this.get(i) * (1 << i);
 
     if (signed)
-        m -= this.signBit()*(1<<this.n);
+        m -= this.signBit() * (1 << this.n);
     return m;
 };
 
@@ -226,15 +226,15 @@ edsac.Value.prototype.assign = function(v) {
 
 // Make a modifiable slice
 edsac.Value.prototype.slice = function(start, n) {
-    return new edsac.Value(this.bits, this.start+start, n);
+    return new edsac.Value(this.bits, this.start + start, n);
 };
 
 // this << m
 edsac.Value.prototype.shiftLeft = function(m) {
     var r = edsac.zeroValue(this.n);
 
-    for (var i = this.n-1; i >= 0; i--)
-        r.set(i, i >= m ? this.get(i-m) : 0);
+    for (var i = this.n - 1; i >= 0; i--)
+        r.set(i, i >= m ? this.get(i - m) : 0);
 
     return r;
 };
@@ -245,7 +245,7 @@ edsac.Value.prototype.shiftArithmeticRight = function(m) {
 
     var signBit = this.signBit();
     for (var i = 0; i < this.n; i++)
-        r.set(i, i + m < this.n ? this.get(i+m) : signBit);
+        r.set(i, i + m < this.n ? this.get(i + m) : signBit);
 
     return r;
 };
@@ -255,7 +255,7 @@ edsac.Value.prototype.shiftRight = function(m) {
     var r = edsac.zeroValue(this.n);
 
     for (var i = 0; i < this.n; i++)
-        r.set(i, i + m < this.n ? this.get(i+m) : 0);
+        r.set(i, i + m < this.n ? this.get(i + m) : 0);
 
     return r;
 };
@@ -267,8 +267,8 @@ edsac.Value.prototype.negate = function() {
     var r = edsac.zeroValue(this.n);
 
     for (var i = 0; i < this.n; i++)
-        r.set(i, 1-this.get(i));
-    r = r.add(new edsac.Value([1,0]));
+        r.set(i, 1 - this.get(i));
+    r = r.add(new edsac.Value([1, 0]));
 
     return r;
 };
@@ -363,8 +363,8 @@ edsac.Value.prototype.divRem = function(w) {
         throw 'division by zero';
 
     var q = edsac.zeroValue(v.n); // quotient
-    var r = edsac.zeroValue(w.n+1); // remainder
-    for (var i = v.n-1; i >= 0; i--) {
+    var r = edsac.zeroValue(w.n + 1); // remainder
+    for (var i = v.n - 1; i >= 0; i--) {
         r = r.shiftLeft(1);
         r.set(0, v.get(i));
 

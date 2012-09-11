@@ -20,7 +20,7 @@ edsac.Printer.prototype.getText = function() {
 
 // Write an arbitrary ASCII character
 edsac.Printer.prototype.writeChar = function(c) {
-    this.lines[this.lines.length-1] += c;
+    this.lines[this.lines.length - 1] += c;
 };
 
 // Write an EDSAC character, from a 5-bit integer
@@ -31,7 +31,7 @@ edsac.Printer.prototype.writeNum = function(num) {
     var c = this.figShift ? edsac.FIGURES.charAt(num) :
         edsac.LETTERS.charAt(num);
 
-    switch(c) {
+    switch (c) {
     case '#': // figs
         this.figShift = true;
         break;
@@ -76,7 +76,7 @@ edsac.numFromChar = function(c) {
     if (num == -1)
         num = edsac.FIGURES.indexOf(c);
     if (num == -1)
-        throw 'unrecognized input character: '+c;
+        throw 'unrecognized input character: ' + c;
     return num;
 };
 
@@ -84,7 +84,7 @@ edsac.numFromChar = function(c) {
 edsac.valueFromOrder = function(s) {
     var parts = /^([A-Z#\.@!&])(\d*)([LS])$/.exec(s);
     if (parts == null)
-        throw 'bad order format: '+s;
+        throw 'bad order format: ' + s;
 
     var result = edsac.zeroValue(17);
 
@@ -95,7 +95,7 @@ edsac.valueFromOrder = function(s) {
     // The number part
     if (parts[2].length > 0) {
         var numPart = edsac.valueFromDecimal(parts[2], 16);
-        var numVal = result.slice(1,16);
+        var numVal = result.slice(1, 16);
         numVal.assign(numVal.add(numPart));
     }
 
@@ -135,76 +135,76 @@ edsac.Value.prototype.describeOrder = function() {
     var addr = order[1];
     var mode = (order[2] ? 1 : 0);
 
-    switch(order[0]) {
+    switch (order[0]) {
     case 'A':
         if (mode)
-            return 'AB += w['+addr+']';
+            return 'AB += w[' + addr + ']';
         else
-            return 'A += m['+addr+']';
+            return 'A += m[' + addr + ']';
     case 'S':
         if (mode)
-            return 'AB -= w['+addr+']';
+            return 'AB -= w[' + addr + ']';
         else
-            return 'A -= m['+addr+']';
+            return 'A -= m[' + addr + ']';
     case 'H':
         if (mode)
-            return 'RS = w['+addr+']';
+            return 'RS = w[' + addr + ']';
         else
-            return 'R = m['+addr+']';
+            return 'R = m[' + addr + ']';
     case 'V':
         if (mode)
-            return 'ABC += w['+addr+'] * RS';
+            return 'ABC += w[' + addr + '] * RS';
         else
-            return 'AB += m['+addr+'] * R';
+            return 'AB += m[' + addr + '] * R';
     case 'N':
         if (mode)
-            return 'ABC -= w['+addr+'] * RS';
+            return 'ABC -= w[' + addr + '] * RS';
         else
-            return 'AB -= m['+addr+'] * R';
+            return 'AB -= m[' + addr + '] * R';
     case 'T':
         if (mode)
-            return 'w['+addr+'] = AB; ABC = 0';
+            return 'w[' + addr + '] = AB; ABC = 0';
         else
-            return 'm['+addr+'] = A; ABC = 0';
+            return 'm[' + addr + '] = A; ABC = 0';
     case 'U':
         if (mode)
-            return 'w['+addr+'] = AB';
+            return 'w[' + addr + '] = AB';
         else
-            return 'm['+addr+'] = A';
+            return 'm[' + addr + '] = A';
     case 'C':
         if (mode)
-            return 'AB += w['+addr+'] & RS';
+            return 'AB += w[' + addr + '] & RS';
         else
-            return 'A += m['+addr+'] & R';
+            return 'A += m[' + addr + '] & R';
     case 'R':
     case 'L': {
         var i = 0;
         while (this.get(i) == 0)
             i++;
         if (op == 'L')
-            return 'ABC <<= '+(i+1);
+            return 'ABC <<= ' + (i + 1);
         else
-            return 'ABC >>= '+(i+1);
+            return 'ABC >>= ' + (i + 1);
     }
     case 'E':
-        return 'if A >= 0 goto '+addr;
+        return 'if A >= 0 goto ' + addr;
     case 'G':
-        return 'if A < 0 goto '+addr;
+        return 'if A < 0 goto ' + addr;
     case 'I':
         if (mode)
-            return 'w['+addr+'] = read()';
+            return 'w[' + addr + '] = read()';
         else
-            return 'm['+addr+'] = read()';
+            return 'm[' + addr + '] = read()';
     case 'O':
         if (mode)
-            return 'write(w['+addr+'])';
+            return 'write(w[' + addr + '])';
         else
-            return 'write(m['+addr+'])';
+            return 'write(m[' + addr + '])';
     case 'F':
         if (mode)
-            return 'w['+addr+'] = last';
+            return 'w[' + addr + '] = last';
         else
-            return 'm['+addr+'] = last';
+            return 'm[' + addr + '] = last';
     case 'Y':
         return 'round ABC';
     case 'Z':
@@ -220,5 +220,7 @@ edsac.Value.prototype.printOrderBinary = function() {
         throw 'wrong value width for an order';
 
     var s = this.printBinary();
-    return s.substr(0,5)+' '+s.substr(5,1)+' '+s.substr(6,10)+' '+s.substr(16,1);
+    return (s.substr(0, 5) + ' ' +
+            s.substr(5, 1) + ' ' +
+            s.substr(6, 10) + ' ' + s.substr(16, 1));
 };

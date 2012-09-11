@@ -66,18 +66,18 @@ edsac.testValue = function() {
 
     edsac.assertBinary(B('011').mult(B('0101')), '0001111');
 
-    edsac.assertDecimal(D('10',5).mult(D('-2',5)), true, '-20');
-    edsac.assertDecimal(D('-10',5).mult(D('-2',5)), true, '20');
+    edsac.assertDecimal(D('10', 5).mult(D('-2', 5)), true, '-20');
+    edsac.assertDecimal(D('-10', 5).mult(D('-2', 5)), true, '20');
 
-    edsac.assertBinary(D('2',3), '010');
-    edsac.assertBinary(I(2,3), '010');
+    edsac.assertBinary(D('2', 3), '010');
+    edsac.assertBinary(I(2, 3), '010');
 
-    edsac.assertBinary(D('-2',3), '110');
-    edsac.assertBinary(I(-2,3), '110');
-    edsac.assertBinary(D('42',7), '0101010');
-    edsac.assertBinary(I(42,7), '0101010');
-    edsac.assertBinary(D('-42',7), '1010110');
-    edsac.assertBinary(I(-42,7), '1010110');
+    edsac.assertBinary(D('-2', 3), '110');
+    edsac.assertBinary(I(-2, 3), '110');
+    edsac.assertBinary(D('42', 7), '0101010');
+    edsac.assertBinary(I(42, 7), '0101010');
+    edsac.assertBinary(D('-42', 7), '1010110');
+    edsac.assertBinary(I(-42, 7), '1010110');
 
     edsac.assertEqual(B('01').compare(B('0')), 1); // 1 > 0
     edsac.assertEqual(B('01').compare(B('011')), -1); // 1 < 3
@@ -234,22 +234,24 @@ edsac.testMachine = function() {
 
     var B = edsac.valueFromBinary;
 
-    edsac.machine.set(42, 1, B(s1+'0'+s1));
+    edsac.machine.set(42, 1, B(s1 + '0' + s1));
     edsac.machine.set(42, 0, B(s0));
-    edsac.assertBinary(edsac.machine.get(42, 1), s1+'0'+s0);
+    edsac.assertBinary(edsac.machine.get(42, 1), s1 + '0' + s0);
     edsac.assertBinary(edsac.machine.get(42, 0), s0);
     edsac.assertBinary(edsac.machine.get(43, 0), s1);
 
-    edsac.machine.setAccum(2, B(s1+'0'+s1+'0'+s1+'0'+s1));
-    edsac.machine.setAccum(1, B(s0+'0'+s0));
+    edsac.machine.setAccum(2, B(s1 + '0' + s1 + '0' + s1 + '0' + s1));
+    edsac.machine.setAccum(1, B(s0 + '0' + s0));
     edsac.machine.setAccum(0, B(s1));
-    edsac.assertBinary(edsac.machine.getAccum(2), s1+'0'+s0+'0'+s1+'0'+s1);
-    edsac.assertBinary(edsac.machine.getAccum(1), s1+'0'+s0);
+    edsac.assertBinary(
+        edsac.machine.getAccum(2),
+        s1 + '0' + s0 + '0' + s1 + '0' + s1);
+    edsac.assertBinary(edsac.machine.getAccum(1), s1 + '0' + s0);
     edsac.assertBinary(edsac.machine.getAccum(0), s1);
 
-    edsac.machine.setMult(1, B(s0+'0'+s0));
+    edsac.machine.setMult(1, B(s0 + '0' + s0));
     edsac.machine.setMult(0, B(s1));
-    edsac.assertBinary(edsac.machine.getMult(1), s1+'0'+s0);
+    edsac.assertBinary(edsac.machine.getMult(1), s1 + '0' + s0);
     edsac.assertBinary(edsac.machine.getMult(0), s1);
 };
 
@@ -271,7 +273,7 @@ edsac.testStep = function() {
             edsac.assertEqual(edsac.machine.getAccum(2).printBinary(),
                               expected);
         }
-    };
+    }
 };
 
 // A list of tuples: [instruction(, expected ABC after running it)]

@@ -7,6 +7,9 @@ edsac.machine = {};
 // 512 words of 35 bits
 edsac.machine.MEM_SIZE = 512;
 
+// hook point to easy hacking
+edsac.machine.hook_after_step = [];
+
 // Reset the machine state
 edsac.machine.init = function() {
     this.mem = new Array(this.MEM_SIZE);
@@ -258,6 +261,11 @@ edsac.machine.step = function() {
         break;
     default:
         throw 'malformed order: ' + orderVal.printOrder();
+    }
+
+    // for easy hacking
+    for(var i = 0; i < edsac.machine.hook_after_step.length; i++){
+        edsac.machine.hook_after_step[i].call(this);
     }
 
     this.setIp(newIp);

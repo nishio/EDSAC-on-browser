@@ -127,7 +127,7 @@ edsac.gui.makeMemItem = function(addr) {
     if (addr % 2 == 1)
         elt.addClass('odd');
 
-    if (addr == edsac.machine.ip)
+    if (addr == edsac.machine.sequence_control_register)
         elt.addClass('current');
 
     return elt;
@@ -135,7 +135,7 @@ edsac.gui.makeMemItem = function(addr) {
 
 edsac.gui.updateStatus = function() {
     var html = '';
-    html += 'SCR = ' + edsac.formatInt(edsac.machine.ip, 4) +
+    html += 'SCR = ' + edsac.formatInt(edsac.machine.sequence_control_register, 4) +
         (edsac.machine.running ? '' : ' (stopped)') + '<br>';
     html += '<br>';
 
@@ -189,9 +189,9 @@ edsac.gui.onSetOutput = function(s) {
     this.output.text(s + '_');
 };
 
-edsac.gui.onSetIp = function(oldIp, newIp) {
-    this.updateMemory(oldIp);
-    this.updateMemory(newIp);
+edsac.gui.onSetSCR = function(old_scr, new_scr) {
+    this.updateMemory(old_scr);
+    this.updateMemory(new_scr);
 };
 
 edsac.gui.step = function() {

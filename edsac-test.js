@@ -262,10 +262,10 @@ edsac.testStep = function() {
     for (var i = 0; i < edsac.STEP_TEST.length; i++)
         edsac.machine.set(i, 0, edsac.valueFromOrder(edsac.STEP_TEST[i][0]));
     while (edsac.machine.running) {
-        var ip = edsac.machine.ip;
+        var scr = edsac.machine.sequence_control_register;
         edsac.machine.step();
 
-        var expected = edsac.STEP_TEST[ip][1];
+        var expected = edsac.STEP_TEST[scr][1];
         if (expected != undefined) {
             expected = expected.replace(/ /g, '');
             while (expected.length < 71)

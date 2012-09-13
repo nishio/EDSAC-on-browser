@@ -17,8 +17,8 @@ edsac.machine.init = function() {
     for (var i = 0; i < this.mem.length; ++i)
         this.mem[i] = edsac.zeroValue(35);
 
-    // Instruction pointer (SCR)
-    this.ip = 0;
+    // Sequence Control Register
+    this.sequence_control_register = 0;
 
     // 71-bit accumulator
     this.abc = edsac.zeroValue(71);
@@ -40,7 +40,7 @@ edsac.machine.init = function() {
 };
 
 edsac.machine.reset = function() {
-    this.setIp(0);
+    this.set_scr(0);
     this.setAccum(2, edsac.zeroValue(71));
     this.setMult(1, edsac.zeroValue(35));
     for (var i = 0; i < this.MEM_SIZE; ++i)
@@ -132,11 +132,11 @@ edsac.machine.setInput = function(s) {
         edsac.gui.onSetInput(s);
 };
 
-edsac.machine.setIp = function(ip) {
-    var oldIp = this.ip;
-    this.ip = ip;
+edsac.machine.set_scr = function(scr) {
+    var old_scr = this.sequence_control_register;
+    this.sequence_control_register = scr;
     if (edsac.gui && edsac.gui.active)
-        edsac.gui.onSetIp(oldIp, ip);
+        edsac.gui.onSetSCR(old_scr, scr);
 };
 
 edsac.machine.readNum = function(s) {
@@ -160,13 +160,13 @@ edsac.machine.BIT_35.set(35, 1);
 
 // Perform one step of execution
 edsac.machine.step = function() {
-    var orderVal = this.get(this.ip, 0);
+    var orderVal = this.get(this.sequence_control_register, 0);
     var order = orderVal.getOrder();
     var op = order[0];
     var addr = order[1];
     var mode = (order[2] ? 1 : 0);
 
-    var newIp = this.ip + 1;
+    var new_scr = this.sequence_control_register + 1;
 
     switch (op) {
     case 'A': // A/AB += mem
@@ -218,11 +218,11 @@ edsac.machine.step = function() {
     }
     case 'E': // if A >= 0 goto N
         if (this.getAccum(2).signBit() == 0)
-            newIp = addr;
+            new_scr = addr;
         break;
     case 'G': // if A < 0 goto N
         if (this.getAccum(2).signBit() == 1)
-            newIp = addr;
+            new_scr = addr;
         break;
     case 'I': { // read character into 5 lowest bits of m[N]
                 // or 5 middle bits of w[N]
@@ -268,7 +268,7 @@ edsac.machine.step = function() {
         edsac.machine.hook_after_step[i].call(this);
     }
 
-    this.setIp(newIp);
+    this.set_scr(new_scr);
 };
 
 // A quick version of the 'initial orders 1' - load all orders from tape.
@@ -283,5 +283,5 @@ edsac.machine.loadInput = function() {
         this.set(addr, false, edsac.valueFromOrder(order));
         addr++;
     }
-    this.setIp(31);
+    this.set_scr(31);
 };
